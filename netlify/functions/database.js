@@ -1,4 +1,4 @@
-import { Client } from 'pg'
+import { Client } from 'pg';
 
 export async function handler(event, context) {
   const client = new Client({
@@ -8,17 +8,17 @@ export async function handler(event, context) {
 
   try {
     await client.connect();
-
-    // Ejemplo: devuelve todos los usuarios
-    const res = await client.query('SELECT * FROM usuarios;');
-
+    const res = await client.query('SELECT NOW() AS fecha_actual;');
     await client.end();
 
     return {
       statusCode: 200,
-      body: JSON.stringify(res.rows)
+      body: JSON.stringify({
+        mensaje: '✅ Conexión exitosa con la base de datos Neon',
+        servidor: process.env.NETLIFY_DATABASE_URL ? 'Detectado' : 'No detectado',
+        resultado: res.rows
+      }, null, 2)
     };
-
   } catch (error) {
     console.error(error);
     return {
@@ -27,3 +27,4 @@ export async function handler(event, context) {
     };
   }
 }
+
