@@ -6,13 +6,25 @@ import dotenv from "dotenv";
 dotenv.config();
 const app = express();
 
-// ✅ Configuración CORS: solo permite el dominio del frontend (Vercel)
 app.use(
   cors({
-    origin: ["https://tablon-clan.vercel.app"], // <-- cambiá esto si tu dominio en Vercel es diferente
+    origin: "*", // Permite cualquier origen (por ahora)
     methods: ["GET", "POST"],
   })
 );
+
+// O mejor (permitir cualquier subdominio de Vercel y tu dominio principal):
+/*
+app.use(
+  cors({
+    origin: [
+      "https://tablon-clan.vercel.app",
+      /https:\/\/[a-zA-Z0-9-]+\.vercel\.app$/, // Esto permite los dominios de preview de Vercel
+    ],
+    methods: ["GET", "POST"],
+  })
+);
+*/
 
 app.use(express.json());
 
