@@ -1,7 +1,4 @@
 {
-  "name": "tablon-clan",
-  "version": "1.0.0",
-  "description": "Backend del proyecto Tablón del Clan",
   "main": "backend/server.js",
   "scripts": {
     "start": "node backend/server.js"
