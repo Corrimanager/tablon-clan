@@ -66,6 +66,8 @@ h2 { font-size:1.7em; text-align:center; color:#2c1f12; border-bottom:2px solid 
 <button id="btn-completadas">✅ Completadas</button>
 </nav>
 
+<button onclick="cerrarSesion()">Cerrar sesión</button>
+
 <!-- CREAR -->
 <section id="crear" class="active">
 <form id="formMision">
@@ -102,6 +104,20 @@ h2 { font-size:1.7em; text-align:center; color:#2c1f12; border-bottom:2px solid 
 </section>
 
 <script>
+// Verificar si hay usuario logueado
+window.addEventListener("load", () => {
+  const usuario = localStorage.getItem("usuarioActual");
+  if (!usuario) {
+    // Si no hay usuario guardado, mostrar login
+    document.getElementById("login").style.display = "block";
+    document.getElementById("mainPage").style.display = "none";
+  } else {
+    // Si hay usuario logueado, mostrar página principal
+    document.getElementById("login").style.display = "none";
+    document.getElementById("mainPage").style.display = "block";
+  }
+});
+
 const recursos={ Albura:50, Arcilla:100, Juncos:75, Piedra:100 };
 let users=JSON.parse(localStorage.getItem('users'))||{};
 let loggedUser=localStorage.getItem('loggedUser')||null;
@@ -276,6 +292,11 @@ filtroRecurso.addEventListener('change',renderMisiones);
 ordenarBtn.addEventListener('click',()=>{ ordenarPorOro=!ordenarPorOro; ordenarBtn.textContent=ordenarPorOro?'🔽 Mostrar todas':'💰 Ordenar por recompensa'; renderMisiones(); });
 filtroCreador.addEventListener('change',renderCompletadas);
 filtroCompletador.addEventListener('change',renderCompletadas);
+
+function cerrarSesion() {
+  localStorage.removeItem("usuarioActual");
+  location.reload();
+}
 
 // --------------------
 // RESET TEMPORAL

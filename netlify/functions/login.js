@@ -5,8 +5,8 @@ export async function handler(event) {
     return { statusCode: 405, body: "Método no permitido" };
   }
 
-  const { nombre, password } = JSON.parse(event.body || "{}");
-  if (!nombre || !password) {
+  const { nombre, pass } = JSON.parse(event.body || "{}");
+  if (!nombre || !pass) {
     return { statusCode: 400, body: "Faltan campos obligatorios" };
   }
 
@@ -18,7 +18,7 @@ export async function handler(event) {
   try {
     await client.connect();
 
-    const res = await client.query("SELECT * FROM usuarios WHERE nombre = $1 AND password = $2", [nombre, password]);
+    const res = await client.query("SELECT * FROM usuarios WHERE nombre = $1 AND pass = $2", [nombre, pass]);
     await client.end();
 
     if (res.rows.length === 0) {

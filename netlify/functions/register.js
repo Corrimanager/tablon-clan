@@ -5,8 +5,8 @@ export async function handler(event) {
     return { statusCode: 405, body: "Método no permitido" };
   }
 
-  const { nombre, password, email } = JSON.parse(event.body || "{}");
-  if (!nombre || !password || !email) {
+  const { nombre, pass, email } = JSON.parse(event.body || "{}");
+  if (!nombre || !pass || !email) {
     return { statusCode: 400, body: "Faltan campos obligatorios" };
   }
 
@@ -30,7 +30,7 @@ export async function handler(event) {
 
     // Insertar nuevo usuario
     await client.query(
-      "INSERT INTO usuarios (nombre, password, email) VALUES ($1, $2, $3)",
+      "INSERT INTO usuarios (nombre, pass, email) VALUES ($1, $2, $3)",
       [nombre, password, email]
     );
 
