@@ -1,9 +1,0 @@
-{
-  "name": "tablon-clan",
-  "version": "1.0.0",
-  "description": "Proyecto Pax Dei - Tablón del Clan",
-  "main": "index.html",
-  "dependencies": {
-    "pg": "^8.11.3"
-  }
-}

@@ -8,7 +8,7 @@ app.use(express.json());
 app.use(cors());
 
 const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
+  connectionString: "postgresql://postgres:[YOUR_PASSWORD]@db.ipwxzkdpgbwgdeflzaks.supabase.co:5432/postgres",
   ssl: { rejectUnauthorized: false },
 });
 
