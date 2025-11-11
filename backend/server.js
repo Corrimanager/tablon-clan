@@ -28,10 +28,10 @@ app.use(
 
 app.use(express.json());
 
-// ✅ Conexión a la base de datos (Supabase o Railway)
+// server.js
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  ssl: { rejectUnauthorized: false },
+  // Se elimina la configuración SSL para conexiones internas de Railway
 });
 
 // ✅ Endpoint base para verificar si el servidor responde
