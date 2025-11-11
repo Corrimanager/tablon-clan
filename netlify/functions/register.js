@@ -31,7 +31,7 @@ export async function handler(event) {
     // Insertar nuevo usuario
     await client.query(
       "INSERT INTO usuarios (nombre, pass, email) VALUES ($1, $2, $3)",
-      [nombre, password, email]
+      [nombre, pass, email]
     );
 
     await client.end();
