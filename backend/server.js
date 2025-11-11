@@ -1,21 +1,33 @@
-const express = require("express");
-const cors = require("cors");
-const { Pool } = require("pg");
-require("dotenv").config();
+import express from "express";
+import cors from "cors";
+import { Pool } from "pg";
+import dotenv from "dotenv";
 
+dotenv.config();
 const app = express();
-app.use(cors());
+
+// ✅ Configuración CORS: solo permite el dominio del frontend (Vercel)
+app.use(
+  cors({
+    origin: ["https://tablon-clan.vercel.app"], // <-- cambiá esto si tu dominio en Vercel es diferente
+    methods: ["GET", "POST"],
+  })
+);
+
 app.use(express.json());
 
+// ✅ Conexión a la base de datos (Supabase o Railway)
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false },
 });
 
+// ✅ Endpoint base para verificar si el servidor responde
 app.get("/", (req, res) => {
   res.json({ message: "Servidor funcionando correctamente 🚀" });
 });
 
+// ✅ Registro de usuario
 app.post("/register", async (req, res) => {
   const { nombre, email, pass } = req.body;
 
@@ -37,11 +49,12 @@ app.post("/register", async (req, res) => {
 
     res.json({ message: "Usuario registrado exitosamente ✅" });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
+    console.error("Error en /register:", err);
+    res.status(500).json({ error: "Error interno del servidor" });
   }
 });
 
+// ✅ Login de usuario
 app.post("/login", async (req, res) => {
   const { nombre, pass } = req.body;
 
@@ -61,12 +74,13 @@ app.post("/login", async (req, res) => {
 
     res.json({ message: "Inicio de sesión exitoso ✅", usuario: result.rows[0] });
   } catch (err) {
-    console.error(err);
-    res.status(500).json({ error: err.message });
+    console.error("Error en /login:", err);
+    res.status(500).json({ error: "Error interno del servidor" });
   }
 });
 
-const PORT = process.env.PORT || 3000;
+// ✅ Puerto
+const PORT = process.env.PORT || 8080;
 app.listen(PORT, () => {
   console.log(`Servidor corriendo en puerto ${PORT}`);
 });

@@ -177,8 +177,8 @@ function actualizarTitulo(){ if(stacksSel.value && recursoSel.value) titulo.valu
 stacksSel.addEventListener('change',actualizarTitulo);
 recursoSel.addEventListener('change',actualizarTitulo);
 
- // URL del backend desplegado en Render
-  const API_BASE = "https://tablon-clan.onrender.com"; // ← cambiá esta por tu URL real de Render
+ // URL del backend desplegado en Railway
+  const API_URL = "https://tablondeclan-production.up.railway.app";
 
   // --- LOGIN ---
   document.getElementById("btnLogin").addEventListener("click", async () => {
@@ -191,11 +191,11 @@ recursoSel.addEventListener('change',actualizarTitulo);
     }
 
     try {
-      const res = await fetch(`${API_BASE}/login`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nombre, pass })
-      });
+      const res = await fetch(`${API_URL}/login`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ nombre, pass }),
+      })
 
       const data = await res.json();
 
@@ -224,11 +224,11 @@ recursoSel.addEventListener('change',actualizarTitulo);
     }
 
     try {
-      const res = await fetch(`${API_BASE}/register`, {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ nombre, pass, email })
-      });
+      const res = await fetch(`${API_URL}/register`, {
+  method: "POST",
+  headers: { "Content-Type": "application/json" },
+  body: JSON.stringify({ nombre, email, pass }),
+      })
 
       const data = await res.json();
 
