@@ -1,61 +1,72 @@
-import express from "express";
-import pkg from "pg";
-import cors from "cors";
+const express = require("express");
+const cors = require("cors");
+const { Pool } = require("pg");
+require("dotenv").config();
 
-const { Pool } = pkg;
 const app = express();
-app.use(express.json());
 app.use(cors());
+app.use(express.json());
 
 const pool = new Pool({
-  connectionString: "postgresql://postgres:[YOUR_PASSWORD]@db.ipwxzkdpgbwgdeflzaks.supabase.co:5432/postgres",
+  connectionString: process.env.DATABASE_URL,
   ssl: { rejectUnauthorized: false },
 });
 
-// --- Registro de usuarios ---
+app.get("/", (req, res) => {
+  res.json({ message: "Servidor funcionando correctamente 🚀" });
+});
+
 app.post("/register", async (req, res) => {
-  const { nombre, pass, email } = req.body;
-  if (!nombre || !pass || !email) {
+  const { nombre, email, pass } = req.body;
+
+  if (!nombre || !email || !pass) {
     return res.status(400).json({ error: "Faltan campos obligatorios" });
   }
+
   try {
-    await pool.query(
-      "INSERT INTO usuarios (nombre, pass, email) VALUES ($1, $2, $3)",
-      [nombre, pass, email]
-    );
-    res.json({ message: "Usuario registrado correctamente" });
+    const checkUser = await pool.query("SELECT * FROM usuarios WHERE nombre = $1", [nombre]);
+    if (checkUser.rows.length > 0) {
+      return res.status(400).json({ error: "El usuario ya existe" });
+    }
+
+    await pool.query("INSERT INTO usuarios (nombre, email, pass) VALUES ($1, $2, $3)", [
+      nombre,
+      email,
+      pass,
+    ]);
+
+    res.json({ message: "Usuario registrado exitosamente ✅" });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Error en el servidor" });
+    res.status(500).json({ error: err.message });
   }
 });
 
-// --- Login ---
 app.post("/login", async (req, res) => {
   const { nombre, pass } = req.body;
+
   if (!nombre || !pass) {
-    return res.status(400).json({ error: "Faltan campos" });
+    return res.status(400).json({ error: "Faltan campos obligatorios" });
   }
+
   try {
     const result = await pool.query(
-      "SELECT * FROM usuarios WHERE nombre=$1 AND pass=$2",
+      "SELECT * FROM usuarios WHERE nombre = $1 AND pass = $2",
       [nombre, pass]
     );
+
     if (result.rows.length === 0) {
-      res.status(401).json({ error: "Usuario o contraseña incorrectos" });
-    } else {
-      res.json({ message: "Login exitoso", usuario: result.rows[0] });
+      return res.status(401).json({ error: "Usuario o contraseña incorrectos ❌" });
     }
+
+    res.json({ message: "Inicio de sesión exitoso ✅", usuario: result.rows[0] });
   } catch (err) {
     console.error(err);
-    res.status(500).json({ error: "Error en el servidor" });
+    res.status(500).json({ error: err.message });
   }
 });
 
-// --- Inicio ---
-app.get("/", (req, res) => {
-  res.send("Servidor funcionando correctamente 🚀");
+const PORT = process.env.PORT || 3000;
+app.listen(PORT, () => {
+  console.log(`Servidor corriendo en puerto ${PORT}`);
 });
-
-const port = process.env.PORT || 3000;
-app.listen(port, () => console.log(`Servidor iniciado en puerto ${port}`));
