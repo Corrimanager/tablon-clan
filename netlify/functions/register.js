@@ -5,8 +5,8 @@ export async function handler(event) {
     return { statusCode: 405, body: "Método no permitido" };
   }
 
-  const { nombre, password } = JSON.parse(event.body || "{}");
-  if (!nombre || !password) {
+  const { nombre, password, email } = JSON.parse(event.body || "{}");
+  if (!nombre || !password || !email) {
     return { statusCode: 400, body: "Faltan campos obligatorios" };
   }
 
@@ -18,17 +18,23 @@ export async function handler(event) {
   try {
     await client.connect();
 
-    // Verificar si el usuario ya existe
-    const check = await client.query("SELECT * FROM usuarios WHERE nombre = $1", [nombre]);
+    // Verificar si ya existe el usuario o el email
+    const check = await client.query(
+      "SELECT * FROM usuarios WHERE nombre = $1 OR email = $2",
+      [nombre, email]
+    );
     if (check.rows.length > 0) {
       await client.end();
-      return { statusCode: 400, body: "El usuario ya existe" };
+      return { statusCode: 400, body: "El usuario o email ya existen" };
     }
 
-    // Insertar el nuevo usuario
-    await client.query("INSERT INTO usuarios (nombre, password) VALUES ($1, $2)", [nombre, password]);
-    await client.end();
+    // Insertar nuevo usuario
+    await client.query(
+      "INSERT INTO usuarios (nombre, password, email) VALUES ($1, $2, $3)",
+      [nombre, password, email]
+    );
 
+    await client.end();
     return { statusCode: 200, body: "Usuario registrado correctamente" };
 
   } catch (error) {

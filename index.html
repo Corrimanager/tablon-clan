@@ -49,11 +49,12 @@ h2 { font-size:1.7em; text-align:center; color:#2c1f12; border-bottom:2px solid 
 
 <!-- REGISTER -->
 <section id="register" style="display:none;">
-<h2>Registro</h2>
-<input type="text" id="regUser" placeholder="Usuario">
-<input type="password" id="regPass" placeholder="Contraseña">
-<button id="btnRegister">Registrar</button>
-<p>Ya tienes cuenta? <a href="#" id="showLogin">Volver al login</a></p>
+  <h2>Registro</h2>
+  <input type="text" id="regUser" placeholder="Usuario">
+  <input type="password" id="regPass" placeholder="Contraseña">
+  <input type="email" id="regEmail" placeholder="Correo electrónico">
+  <button id="btnRegister">Registrar</button>
+  <p>Ya tienes cuenta? <a href="#" id="showLogin">Volver al login</a></p>
 </section>
 
 <!-- APP -->
@@ -164,11 +165,12 @@ recursoSel.addEventListener('change',actualizarTitulo);
 document.getElementById("btnRegister").addEventListener("click", async () => {
   const nombre = document.getElementById("regUser").value;
   const password = document.getElementById("regPass").value;
+  const email = document.getElementById("regEmail").value;
 
   const res = await fetch("/.netlify/functions/register", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ nombre, password })
+    body: JSON.stringify({ nombre, password, email })
   });
 
   const texto = await res.text();
