@@ -160,25 +160,36 @@ function actualizarTitulo(){ if(stacksSel.value && recursoSel.value) titulo.valu
 stacksSel.addEventListener('change',actualizarTitulo);
 recursoSel.addEventListener('change',actualizarTitulo);
 
-// --------------------
-// REGISTRO / LOGIN
-// --------------------
-btnRegister.addEventListener('click',()=>{
-  const u=regUser.value.trim(); const p=regPass.value;
-  if(!u||!p){ alert('Completa todos los campos'); return; }
-  if(users[u]){ alert('Usuario ya existe'); return; }
-  users[u]=p; guardar(); alert('Registro exitoso'); regUser.value=''; regPass.value=''; registerSec.style.display='none'; loginSec.style.display='block';
+// Evento para registrarse
+document.getElementById("btnRegister").addEventListener("click", async () => {
+  const nombre = document.getElementById("regUser").value;
+  const password = document.getElementById("regPass").value;
+
+  const res = await fetch("/.netlify/functions/register", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ nombre, password })
+  });
+
+  const texto = await res.text();
+  alert(texto);
 });
 
-btnLogin.addEventListener('click',()=>{
-  const u=loginUser.value.trim(); const p=loginPass.value;
-  if(users[u] && users[u]===p){
-    loggedUser=u; guardar();
-    loginSec.style.display='none'; registerSec.style.display='none'; appSec.style.display='block';
-    inicializarFormMision(); actualizarUsuarioLogueadoUI();
-    renderMisiones(); renderCompletadas();
-  }else{ alert('Usuario o contraseña incorrectos'); }
+// Evento para login
+document.getElementById("btnLogin").addEventListener("click", async () => {
+  const nombre = document.getElementById("loginUser").value;
+  const password = document.getElementById("loginPass").value;
+
+  const res = await fetch("/.netlify/functions/login", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ nombre, password })
+  });
+
+  const data = await res.text();
+  alert(data);
 });
+
 
 // --------------------
 // CREAR MISION
@@ -271,6 +282,7 @@ window.resetearDatos=function(){ localStorage.removeItem('misiones'); localStora
 
 // Si ya estaba logueado
 if(loggedUser){ loginSec.style.display='none'; appSec.style.display='block'; inicializarFormMision(); actualizarUsuarioLogueadoUI(); renderMisiones(); renderCompletadas();}
+
 </script>
 </body>
 </html>
