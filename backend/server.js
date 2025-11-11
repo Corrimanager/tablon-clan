@@ -31,7 +31,8 @@ app.use(express.json());
 // server.js
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  // Se elimina la configuración SSL para conexiones internas de Railway
+  // Para conexiones internas de Railway, es mejor no forzar SSL
+  // Si la conexión fallara aquí, Railway debería manejarlo.
 });
 
 // ✅ Endpoint base para verificar si el servidor responde
