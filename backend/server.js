@@ -6,33 +6,23 @@ import dotenv from "dotenv";
 dotenv.config();
 const app = express();
 
+// 1. ✅ CORRECCIÓN DE CORS (Asegura que Vercel pueda hablar con Railway)
 app.use(
   cors({
-    origin: "*", // Permite cualquier origen (por ahora)
+    // Permite que Vercel y sus subdominios de preview se conecten
+    // Se deja solo el dominio principal para mayor seguridad.
+    origin: ["https://tablon-clan.vercel.app"], 
     methods: ["GET", "POST"],
   })
 );
-
-// O mejor (permitir cualquier subdominio de Vercel y tu dominio principal):
-/*
-app.use(
-  cors({
-    origin: [
-      "https://tablon-clan.vercel.app",
-      /https:\/\/[a-zA-Z0-9-]+\.vercel\.app$/, // Esto permite los dominios de preview de Vercel
-    ],
-    methods: ["GET", "POST"],
-  })
-);
-*/
 
 app.use(express.json());
 
-// server.js
+// 2. ✅ CONEXIÓN A LA BASE DE DATOS (Se elimina la configuración SSL para Railway)
 const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
-  // Para conexiones internas de Railway, es mejor no forzar SSL
-  // Si la conexión fallara aquí, Railway debería manejarlo.
+  // Se elimina 'ssl: { rejectUnauthorized: false }'
+  // El error de "relation" no se debe a la conexión, pero se quita la opción innecesaria.
 });
 
 // ✅ Endpoint base para verificar si el servidor responde
@@ -40,19 +30,22 @@ app.get("/", (req, res) => {
   res.json({ message: "Servidor funcionando correctamente 🚀" });
 });
 
-// ✅ Código corregido para el registro (/register)
-
+// ✅ Registro de usuario
 app.post("/register", async (req, res) => {
-  // ... omisión de código ...
+  const { nombre, email, pass } = req.body;
+
+  if (!nombre || !email || !pass) {
+    return res.status(400).json({ error: "Faltan campos obligatorios" });
+  }
 
   try {
-    // 1. SELECT: Cambiar "usuarios" por "public.usuarios"
-    const checkUser = await pool.query("SELECT * FROM public.usuarios WHERE nombre = $1", [nombre]); 
+    // 3. ✅ CORRECCIÓN SQL: Se añade 'public.' para buscar la tabla en el schema correcto
+    const checkUser = await pool.query("SELECT * FROM public.usuarios WHERE nombre = $1", [nombre]);
     if (checkUser.rows.length > 0) {
       return res.status(400).json({ error: "El usuario ya existe" });
     }
 
-    // 2. INSERT: Cambiar "usuarios" por "public.usuarios"
+    // 4. ✅ CORRECCIÓN SQL: Se añade 'public.' en el INSERT
     await pool.query("INSERT INTO public.usuarios (nombre, email, pass) VALUES ($1, $2, $3)", [
       nombre,
       email,
@@ -61,17 +54,21 @@ app.post("/register", async (req, res) => {
 
     res.json({ message: "Usuario registrado exitosamente ✅" });
   } catch (err) {
-    // ... omisión de código ...
+    console.error("Error en /register:", err);
+    res.status(500).json({ error: "Error interno del servidor" });
   }
 });
 
-// ✅ Código corregido para el login (/login)
-
+// ✅ Login de usuario
 app.post("/login", async (req, res) => {
-  // ... omisión de código ...
+  const { nombre, pass } = req.body;
+
+  if (!nombre || !pass) {
+    return res.status(400).json({ error: "Faltan campos obligatorios" });
+  }
 
   try {
-    // 3. SELECT: Cambiar "usuarios" por "public.usuarios"
+    // 5. ✅ CORRECCIÓN SQL: Se añade 'public.' para buscar la tabla en el schema correcto
     const result = await pool.query(
       "SELECT * FROM public.usuarios WHERE nombre = $1 AND pass = $2",
       [nombre, pass]
@@ -80,7 +77,11 @@ app.post("/login", async (req, res) => {
     if (result.rows.length === 0) {
       return res.status(401).json({ error: "Usuario o contraseña incorrectos ❌" });
     }
-    // ... omisión de código ...
+
+    res.json({ message: "Inicio de sesión exitoso ✅", usuario: result.rows[0] });
+  } catch (err) {
+    console.error("Error en /login:", err);
+    res.status(500).json({ error: "Error interno del servidor" });
   }
 });
 
