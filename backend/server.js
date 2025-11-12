@@ -40,21 +40,20 @@ app.get("/", (req, res) => {
   res.json({ message: "Servidor funcionando correctamente 🚀" });
 });
 
-// ✅ Registro de usuario
-app.post("/register", async (req, res) => {
-  const { nombre, email, pass } = req.body;
+// ✅ Código corregido para el registro (/register)
 
-  if (!nombre || !email || !pass) {
-    return res.status(400).json({ error: "Faltan campos obligatorios" });
-  }
+app.post("/register", async (req, res) => {
+  // ... omisión de código ...
 
   try {
-    const checkUser = await pool.query("SELECT * FROM usuarios WHERE nombre = $1", [nombre]);
+    // 1. SELECT: Cambiar "usuarios" por "public.usuarios"
+    const checkUser = await pool.query("SELECT * FROM public.usuarios WHERE nombre = $1", [nombre]); 
     if (checkUser.rows.length > 0) {
       return res.status(400).json({ error: "El usuario ya existe" });
     }
 
-    await pool.query("INSERT INTO usuarios (nombre, email, pass) VALUES ($1, $2, $3)", [
+    // 2. INSERT: Cambiar "usuarios" por "public.usuarios"
+    await pool.query("INSERT INTO public.usuarios (nombre, email, pass) VALUES ($1, $2, $3)", [
       nombre,
       email,
       pass,
@@ -62,8 +61,7 @@ app.post("/register", async (req, res) => {
 
     res.json({ message: "Usuario registrado exitosamente ✅" });
   } catch (err) {
-    console.error("Error en /register:", err);
-    res.status(500).json({ error: "Error interno del servidor" });
+    // ... omisión de código ...
   }
 });
 
