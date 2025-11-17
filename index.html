@@ -33,6 +33,64 @@ h2 { font-size:1.7em; text-align:center; color:#2c1f12; border-bottom:2px solid 
 .filtros { display:flex; justify-content:center; gap:15px; margin-bottom:15px; align-items:center; }
 .filtros select, .filtros button { font-size:16px; padding:7px 12px; }
 #usuarioLogueado { margin-bottom: 15px; font-weight:bold; }
+/* Contenedor del menú */
+#userMenuContainer {
+  position: absolute;
+  top: 20px;
+  left: 20px;
+  color: #e0c28b;
+  font-family: 'Cinzel', serif;
+  font-size: 18px;
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Botón principal */
+#userMenuButton {
+  background: rgba(0,0,0,0.4);
+  padding: 8px 15px;
+  border: 2px solid #c49a5f;
+  border-radius: 8px;
+  box-shadow: 0 0 8px rgba(0,0,0,0.5);
+  transition: 0.3s;
+}
+
+#userMenuButton:hover {
+  background: rgba(0,0,0,0.6);
+}
+
+/* Dropdown */
+#userMenuDropdown {
+  display: none;
+  position: absolute;
+  top: 45px;
+  left: 0;
+  background: #3a2f23;
+  border: 2px solid #c49a5f;
+  border-radius: 10px;
+  box-shadow: 0 0 10px rgba(0,0,0,0.6);
+  padding: 10px;
+  z-index: 10;
+}
+
+#userMenuDropdown button {
+  display: block;
+  width: 100%;
+  text-align: left;
+  background: none;
+  border: none;
+  color: #e0c28b;
+  padding: 10px;
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+  cursor: pointer;
+  transition: 0.2s;
+}
+
+#userMenuDropdown button:hover {
+  background: rgba(255,255,255,0.1);
+}
+
 </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
@@ -576,6 +634,7 @@ h2 { font-size:1.7em; text-align:center; color:#2c1f12; border-bottom:2px solid 
 </script>
 </body>
 </html>
+
 
 
 
