@@ -631,9 +631,48 @@ h2 { font-size:1.7em; text-align:center; color:#2c1f12; border-bottom:2px solid 
     registerSec.style.display = "none";
     appSec.style.display = "none";
   }
+  // ===== MENÚ DESPLEGABLE DEL USUARIO =====
+const userMenuButton = document.getElementById("userMenuButton");
+const userMenuDropdown = document.getElementById("userMenuDropdown");
+const userNameText = document.getElementById("userNameText");
+
+// Mostrar nombre del usuario logueado
+if (loggedUser) {
+  userNameText.textContent = loggedUser;
+}
+
+// Abrir/cerrar menú
+userMenuButton.addEventListener("click", () => {
+  userMenuDropdown.style.display =
+    userMenuDropdown.style.display === "block" ? "none" : "block";
+});
+
+// Cerrar el menú si clickeás fuera
+document.addEventListener("click", (e) => {
+  if (!userMenuContainer.contains(e.target)) {
+    userMenuDropdown.style.display = "none";
+  }
+});
+
+// Botón "Cerrar sesión"
+document.getElementById("menuLogout").addEventListener("click", () => {
+  cerrarSesion();
+});
+
+// Botón "Perfil"
+document.getElementById("menuPerfil").addEventListener("click", () => {
+  alert("Tu perfil estará disponible pronto. 😄");
+});
+
+// Botón "Historial"
+document.getElementById("menuHistorial").addEventListener("click", () => {
+  alert("En breve podrás ver todas tus misiones creadas y completadas.");
+});
+
 </script>
 </body>
 </html>
+
 
 
 
