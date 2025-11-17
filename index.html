@@ -93,20 +93,21 @@ h2 { font-size:1.7em; text-align:center; color:#2c1f12; border-bottom:2px solid 
 
 </style>
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-</head>
-<body>
-<header><h1>🪵 Tablón del Clan - Pax Dei</h1>
-<div id="userMenuContainer">
-  <div id="userMenuButton">
-    <span id="userNameText"></span> ▼
+<header>
+  <div id="userMenuContainer">
+    <div id="userMenuButton">
+      <span id="userNameText"></span> ▼
+    </div>
+    <div id="userMenuDropdown">
+      <button id="menuPerfil">Perfil</button>
+      <button id="menuHistorial">Historial de misiones</button>
+      <button id="menuLogout">Cerrar sesión</button>
+    </div>
   </div>
-  <div id="userMenuDropdown">
-    <button id="menuPerfil">Perfil</button>
-    <button id="menuHistorial">Historial de misiones</button>
-    <button id="menuLogout">Cerrar sesión</button>
-  </div>
-</div>
+
+  <h1>🪵 Tablón del Clan - Pax Dei</h1>
 </header>
+
 
 <!-- LOGIN -->
 <section id="login" class="active">
@@ -672,6 +673,7 @@ document.getElementById("menuHistorial").addEventListener("click", () => {
 </script>
 </body>
 </html>
+
 
 
 
