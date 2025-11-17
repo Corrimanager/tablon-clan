@@ -130,14 +130,11 @@ h2 { font-size:1.7em; text-align:center; color:#2c1f12; border-bottom:2px solid 
 
 <!-- APP -->
 <main id="app" style="display:none;">
-<div id="usuarioLogueado"></div>
 <nav>
 <button id="btn-crear" class="active">➕ Crear Misión</button>
 <button id="btn-ver">📜 Ver Misiones</button>
 <button id="btn-completadas">✅ Completadas</button>
 </nav>
-
-<button onclick="cerrarSesion()">Cerrar sesión</button>
 
 <!-- CREAR -->
 <section id="crear" class="active">
@@ -636,6 +633,8 @@ h2 { font-size:1.7em; text-align:center; color:#2c1f12; border-bottom:2px solid 
 const userMenuButton = document.getElementById("userMenuButton");
 const userMenuDropdown = document.getElementById("userMenuDropdown");
 const userNameText = document.getElementById("userNameText");
+const userMenuContainer = document.getElementById("userMenuContainer");
+
 
 // Mostrar nombre del usuario logueado
 if (loggedUser) {
@@ -673,6 +672,7 @@ document.getElementById("menuHistorial").addEventListener("click", () => {
 </script>
 </body>
 </html>
+
 
 
 
