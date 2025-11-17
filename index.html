@@ -37,7 +37,18 @@ h2 { font-size:1.7em; text-align:center; color:#2c1f12; border-bottom:2px solid 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
-<header><h1>🪵 Tablón del Clan - Pax Dei</h1></header>
+<header><h1>🪵 Tablón del Clan - Pax Dei</h1>
+<div id="userMenuContainer">
+  <div id="userMenuButton">
+    <span id="userNameText"></span> ▼
+  </div>
+  <div id="userMenuDropdown">
+    <button id="menuPerfil">Perfil</button>
+    <button id="menuHistorial">Historial de misiones</button>
+    <button id="menuLogout">Cerrar sesión</button>
+  </div>
+</div>
+</header>
 
 <!-- LOGIN -->
 <section id="login" class="active">
@@ -565,5 +576,6 @@ h2 { font-size:1.7em; text-align:center; color:#2c1f12; border-bottom:2px solid 
 </script>
 </body>
 </html>
+
 
 
