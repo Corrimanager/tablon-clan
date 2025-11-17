@@ -105,246 +105,465 @@ h2 { font-size:1.7em; text-align:center; color:#2c1f12; border-bottom:2px solid 
 </section>
 
 <script>
-// Verificar si hay usuario logueado
-window.addEventListener("load", () => {
-  const usuario = localStorage.getItem("usuarioActual");
-  if (!usuario) {
-    // Si no hay usuario guardado, mostrar login
-    document.getElementById("login").style.display = "block";
-    document.getElementById("mainPage").style.display = "none";
-  } else {
-    // Si hay usuario logueado, mostrar página principal
-    document.getElementById("login").style.display = "none";
-    document.getElementById("mainPage").style.display = "block";
+  // ==========================
+  // CONFIGURACIÓN SUPABASE
+  // ==========================
+  const SUPABASE_URL = "https://ipwxzkdpgbwgdeflzaks.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlwd3h6a2RwZ2J3Z2RlZmx6YWtzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI4MTQ4NDksImV4cCI6MjA3ODM5MDg0OX0.LwtXhr_AY-6f09thVqaUSiop2YvqEEc4X5Vg1-jZQvQ";
+
+  const { createClient } = supabase;
+  const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // ==========================
+  // DATOS EN LOCALSTORAGE
+  // ==========================
+  const recursos = { Albura: 50, Arcilla: 100, Juncos: 75, Piedra: 100 };
+
+  let misiones = JSON.parse(localStorage.getItem("misiones")) || [];
+  let completadas = JSON.parse(localStorage.getItem("completadas")) || [];
+  let loggedUser = localStorage.getItem("loggedUser") || null;
+
+  // ==========================
+  // REFERENCIAS AL DOM
+  // ==========================
+  const loginSec = document.getElementById("login");
+  const registerSec = document.getElementById("register");
+  const appSec = document.getElementById("app");
+
+  const loginUser = document.getElementById("loginUser");
+  const loginPass = document.getElementById("loginPass");
+  const regUser = document.getElementById("regUser");
+  const regPass = document.getElementById("regPass");
+  const regEmail = document.getElementById("regEmail");
+  const btnLogin = document.getElementById("btnLogin");
+  const btnRegister = document.getElementById("btnRegister");
+  const showRegister = document.getElementById("showRegister");
+  const showLogin = document.getElementById("showLogin");
+  const usuarioLogueado = document.getElementById("usuarioLogueado");
+
+  const form = document.getElementById("formMision");
+  const titulo = document.getElementById("titulo");
+  const stacksSel = document.getElementById("stacks");
+  const recursoSel = document.getElementById("recurso");
+  const oroInput = document.getElementById("oro");
+  const autorInput = document.getElementById("autor");
+  const filtroRecurso = document.getElementById("filtroRecurso");
+  const ordenarBtn = document.getElementById("ordenarOro");
+  const listaMisiones = document.getElementById("listaMisiones");
+  const listaCompletadas = document.getElementById("listaCompletadas");
+  const filtroCreador = document.getElementById("filtroCreador");
+  const filtroCompletador = document.getElementById("filtroCompletador");
+
+  let ordenarPorOro = false;
+
+  // ==========================
+  // UTILIDADES GENERALES
+  // ==========================
+  function guardar() {
+    localStorage.setItem("misiones", JSON.stringify(misiones));
+    localStorage.setItem("completadas", JSON.stringify(completadas));
+    localStorage.setItem("loggedUser", loggedUser);
   }
-});
 
-const recursos={ Albura:50, Arcilla:100, Juncos:75, Piedra:100 };
-let users=JSON.parse(localStorage.getItem('users'))||{};
-let loggedUser=localStorage.getItem('loggedUser')||null;
-let misiones=JSON.parse(localStorage.getItem('misiones'))||[];
-let completadas=JSON.parse(localStorage.getItem('completadas'))||[];
-let ordenarPorOro=false;
+  function actualizarUsuarioLogueadoUI() {
+    if (loggedUser) {
+      usuarioLogueado.textContent = `Usuario: ${loggedUser}`;
+    } else {
+      usuarioLogueado.textContent = "";
+    }
+  }
 
-// DOM
-const loginSec=document.getElementById('login');
-const registerSec=document.getElementById('register');
-const appSec=document.getElementById('app');
-const loginUser=document.getElementById('loginUser');
-const loginPass=document.getElementById('loginPass');
-const regUser=document.getElementById('regUser');
-const regPass=document.getElementById('regPass');
-const btnLogin=document.getElementById('btnLogin');
-const btnRegister=document.getElementById('btnRegister');
-const showRegister=document.getElementById('showRegister');
-const showLogin=document.getElementById('showLogin');
-const usuarioLogueado=document.getElementById('usuarioLogueado');
-
-const form=document.getElementById('formMision');
-const titulo=document.getElementById('titulo');
-const stacksSel=document.getElementById('stacks');
-const recursoSel=document.getElementById('recurso');
-const oroInput=document.getElementById('oro');
-const autorInput=document.getElementById('autor');
-const filtroRecurso=document.getElementById('filtroRecurso');
-const ordenarBtn=document.getElementById('ordenarOro');
-const listaMisiones=document.getElementById('listaMisiones');
-const listaCompletadas=document.getElementById('listaCompletadas');
-const filtroCreador=document.getElementById('filtroCreador');
-const filtroCompletador=document.getElementById('filtroCompletador');
-
-showRegister.addEventListener('click',e=>{ e.preventDefault(); loginSec.style.display='none'; registerSec.style.display='block'; });
-showLogin.addEventListener('click',e=>{ e.preventDefault(); registerSec.style.display='none'; loginSec.style.display='block'; });
-
-function guardar(){
-  localStorage.setItem('misiones',JSON.stringify(misiones));
-  localStorage.setItem('completadas',JSON.stringify(completadas));
-  localStorage.setItem('users',JSON.stringify(users));
-  localStorage.setItem('loggedUser',loggedUser);
-}
-
-function actualizarUsuarioLogueadoUI(){ usuarioLogueado.textContent=`Usuario: ${loggedUser}`; }
-function inicializarFormMision(){
-  stacksSel.innerHTML='<option value="">Stacks</option>';
-  for(let i=1;i<=36;i++){ const o=document.createElement('option'); o.value=i; o.textContent=i; stacksSel.appendChild(o);}
-  recursoSel.innerHTML='<option value="">Selecciona un recurso</option>';
-  Object.keys(recursos).forEach(r=>{ const o=document.createElement('option'); o.value=r; o.textContent=r; recursoSel.appendChild(o); 
-    // filtro recurso también
-    if(!Array.from(filtroRecurso.options).some(opt=>opt.value===r)) filtroRecurso.appendChild(o.cloneNode(true));
-  });
-  autorInput.value=loggedUser;
-}
-function actualizarTitulo(){ if(stacksSel.value && recursoSel.value) titulo.value=`Recolectar ${stacksSel.value} stacks de ${recursoSel.value}`; else titulo.value=''; }
-stacksSel.addEventListener('change',actualizarTitulo);
-recursoSel.addEventListener('change',actualizarTitulo);
-
- // URL del backend desplegado en Railway
-  const API_URL = "https://tablondelclan-production.up.railway.app";
-
-  // --- LOGIN ---
-  document.getElementById("btnLogin").addEventListener("click", async () => {
-    const nombre = document.getElementById("loginUser").value.trim();
-    const pass = document.getElementById("loginPass").value.trim();
-
-    if (!nombre || !pass) {
-      alert("Por favor completá usuario y contraseña.");
-      return;
+  function inicializarFormMision() {
+    // Stacks
+    stacksSel.innerHTML = '<option value="">Stacks</option>';
+    for (let i = 1; i <= 36; i++) {
+      const o = document.createElement("option");
+      o.value = i;
+      o.textContent = i;
+      stacksSel.appendChild(o);
     }
 
-    try {
-      const res = await fetch(`${API_URL}/login`, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ nombre, pass }),
-      })
+    // Recursos
+    recursoSel.innerHTML = '<option value="">Selecciona un recurso</option>';
+    Object.keys(recursos).forEach((r) => {
+      const o = document.createElement("option");
+      o.value = r;
+      o.textContent = r;
+      recursoSel.appendChild(o);
 
-      const data = await res.json();
-
-      if (res.ok) {
-        alert(data.message || "Inicio de sesión exitoso");
-        localStorage.setItem("usuarioActual", JSON.stringify(data.usuario));
-        location.reload();
-      } else {
-        alert(data.error || "Error al iniciar sesión");
+      // también al filtro
+      if (!Array.from(filtroRecurso.options).some((opt) => opt.value === r)) {
+        filtroRecurso.appendChild(o.cloneNode(true));
       }
-    } catch (err) {
-      console.error(err);
-      alert("Error de conexión con el servidor.");
+    });
+
+    autorInput.value = loggedUser || "";
+  }
+
+  function actualizarTitulo() {
+    if (stacksSel.value && recursoSel.value) {
+      titulo.value = `Recolectar ${stacksSel.value} stacks de ${recursoSel.value}`;
+    } else {
+      titulo.value = "";
     }
+  }
+
+  stacksSel.addEventListener("change", actualizarTitulo);
+  recursoSel.addEventListener("change", actualizarTitulo);
+
+  // ==========================
+  // CAMBIO ENTRE LOGIN / REGISTRO
+  // ==========================
+  showRegister.addEventListener("click", (e) => {
+    e.preventDefault();
+    loginSec.style.display = "none";
+    registerSec.style.display = "block";
   });
 
-  // --- REGISTRO ---
-  document.getElementById("btnRegister").addEventListener("click", async () => {
-    const nombre = document.getElementById("regUser").value.trim();
-    const pass = document.getElementById("regPass").value.trim();
-    const email = document.getElementById("regEmail").value.trim();
+  showLogin.addEventListener("click", (e) => {
+    e.preventDefault();
+    registerSec.style.display = "none";
+    loginSec.style.display = "block";
+  });
 
-    if (!nombre || !pass || !email) {
+  // ==========================
+  // REGISTRO CON SUPABASE
+  // ==========================
+  btnRegister.addEventListener("click", async () => {
+    const nombre = regUser.value.trim();
+    const email = regEmail.value.trim();
+    const pass = regPass.value.trim();
+
+    if (!nombre || !email || !pass) {
       alert("Por favor completá todos los campos.");
       return;
     }
 
     try {
-      const res = await fetch(`${API_URL}/register`, {
-  method: "POST",
-  headers: { "Content-Type": "application/json" },
-  body: JSON.stringify({ nombre, email, pass }),
-      })
+      const { data, error } = await supabaseClient.auth.signUp({
+        email,
+        password: pass,
+        options: {
+          data: { nombre }, // se guarda como metadata del usuario
+        },
+      });
 
-      const data = await res.json();
-
-      if (res.ok) {
-        alert(data.message || "Usuario registrado correctamente");
-        document.getElementById("regUser").value = "";
-        document.getElementById("regPass").value = "";
-        document.getElementById("regEmail").value = "";
-      } else {
-        alert(data.error || "Error al registrar usuario");
+      if (error) {
+        console.error(error);
+        alert(error.message || "Error al registrar usuario.");
+        return;
       }
+
+      alert("Usuario registrado. Ahora podés iniciar sesión.");
+      regUser.value = "";
+      regEmail.value = "";
+      regPass.value = "";
+      registerSec.style.display = "none";
+      loginSec.style.display = "block";
     } catch (err) {
       console.error(err);
-      alert("Error de conexión con el servidor.");
+      alert("Error de conexión con Supabase.");
     }
   });
 
-// --------------------
-// CREAR MISION
-// --------------------
-form.addEventListener('submit',e=>{
-  e.preventDefault();
-  if(!titulo.value){ alert('Selecciona stack y recurso'); return; }
-  const id=Date.now()+Math.floor(Math.random()*1000);
-  const nueva={ id, titulo:titulo.value, stack:parseInt(stacksSel.value), recurso:recursoSel.value, oro:parseInt(oroInput.value)||0, autor:loggedUser, fecha:new Date().toLocaleDateString(), tomadoPor:null };
-  misiones.unshift(nueva); guardar(); form.reset(); titulo.value=''; inicializarFormMision(); renderMisiones();
-});
+  // ==========================
+  // LOGIN CON SUPABASE
+  // ==========================
+  btnLogin.addEventListener("click", async () => {
+    // IMPORTANTE: acá vamos a usar el campo de login como CORREO
+    const email = loginUser.value.trim();
+    const pass = loginPass.value.trim();
 
-// --------------------
-// NAVIGATION
-// --------------------
-const secciones={ crear:document.getElementById('crear'), ver:document.getElementById('ver'), completadas:document.getElementById('completadas') };
-const botones={ crear:document.getElementById('btn-crear'), ver:document.getElementById('btn-ver'), completadas:document.getElementById('btn-completadas') };
-Object.keys(botones).forEach(k=>{
-  botones[k].addEventListener('click',()=>{
-    Object.values(secciones).forEach(s=>s.classList.remove('active'));
-    Object.values(botones).forEach(b=>b.classList.remove('active'));
-    secciones[k].classList.add('active'); botones[k].classList.add('active');
-    if(k==='ver') renderMisiones(); if(k==='completadas') renderCompletadas();
+    if (!email || !pass) {
+      alert("Por favor completá correo y contraseña.");
+      return;
+    }
+
+    try {
+      const { data, error } = await supabaseClient.auth.signInWithPassword({
+        email,
+        password: pass,
+      });
+
+      if (error) {
+        console.error(error);
+        alert(error.message || "Error al iniciar sesión.");
+        return;
+      }
+
+      // Nombre para mostrar en la app
+      const user = data.user;
+      const nombreParaMostrar =
+        (user.user_metadata && user.user_metadata.nombre) || user.email;
+
+      loggedUser = nombreParaMostrar;
+      guardar();
+
+      loginSec.style.display = "none";
+      registerSec.style.display = "none";
+      appSec.style.display = "block";
+
+      inicializarFormMision();
+      actualizarUsuarioLogueadoUI();
+      renderMisiones();
+      renderCompletadas();
+    } catch (err) {
+      console.error(err);
+      alert("Error de conexión con Supabase.");
+    }
   });
-});
 
-// --------------------
-// FUNCIONES RENDER
-// --------------------
-function renderMisiones(){
-  listaMisiones.innerHTML=''; let visible=[...misiones];
-  if(filtroRecurso.value) visible=visible.filter(m=>m.recurso===filtroRecurso.value);
-  if(ordenarPorOro) visible.sort((a,b)=>b.oro-a.oro);
-  if(visible.length===0){ listaMisiones.innerHTML='<p>No hay misiones activas con esos criterios.</p>'; return; }
-  visible.forEach(m=>{
-    const total=(recursos[m.recurso]||0)*m.stack;
-    const card=document.createElement('div'); card.className='mision'+(m.tomadoPor?' tomada':'');
-    card.innerHTML=`<h3>${m.titulo}</h3>
-      <p>🏷️ Recurso: ${m.recurso} (${m.stack} stacks = ${total} unidades)</p>
-      <p>📅 Creada el: ${m.fecha}</p>
-      <p>👤 Autor: ${m.autor}</p>
-      ${m.tomadoPor?`<p>⚒️ En curso por: <strong>${m.tomadoPor}</strong></p>`:''}`;
-    const btns=document.createElement('div'); btns.className='botones-mision';
-    if(!m.tomadoPor){ const takeBtn=document.createElement('button'); takeBtn.textContent='🪓 Tomar'; takeBtn.addEventListener('click',()=>{ m.tomadoPor=loggedUser; guardar(); renderMisiones(); }); btns.appendChild(takeBtn); }
-    else{ const compBtn=document.createElement('button'); compBtn.textContent='✅ Completar'; compBtn.addEventListener('click',()=>{ completarMisionPorId(m.id); }); btns.appendChild(compBtn);}
-    const delBtn=document.createElement('button'); delBtn.textContent='🗑️ Borrar'; delBtn.addEventListener('click',()=>{ if(confirm('¿Borrar esta misión?')){ misiones=misiones.filter(x=>x.id!==m.id); guardar(); renderMisiones(); } }); btns.appendChild(delBtn);
-    card.appendChild(btns); listaMisiones.appendChild(card);
+  // ==========================
+  // CREAR MISIÓN
+  // ==========================
+  form.addEventListener("submit", (e) => {
+    e.preventDefault();
+    if (!titulo.value) {
+      alert("Selecciona stack y recurso");
+      return;
+    }
+    const id = Date.now() + Math.floor(Math.random() * 1000);
+    const nueva = {
+      id,
+      titulo: titulo.value,
+      stack: parseInt(stacksSel.value),
+      recurso: recursoSel.value,
+      oro: parseInt(oroInput.value) || 0,
+      autor: loggedUser,
+      fecha: new Date().toLocaleDateString(),
+      tomadoPor: null,
+    };
+    misiones.unshift(nueva);
+    guardar();
+    form.reset();
+    titulo.value = "";
+    inicializarFormMision();
+    renderMisiones();
   });
-}
 
-function completarMisionPorId(id){
-  const idx=misiones.findIndex(x=>x.id===id);
-  if(idx===-1) return;
-  const m=misiones[idx];
-  m.completadaPor=loggedUser; completadas.unshift(m); misiones.splice(idx,1); guardar(); renderMisiones(); renderCompletadas();
-}
+  // ==========================
+  // NAVEGACIÓN ENTRE SECCIONES
+  // ==========================
+  const secciones = {
+    crear: document.getElementById("crear"),
+    ver: document.getElementById("ver"),
+    completadas: document.getElementById("completadas"),
+  };
+  const botones = {
+    crear: document.getElementById("btn-crear"),
+    ver: document.getElementById("btn-ver"),
+    completadas: document.getElementById("btn-completadas"),
+  };
 
-function renderCompletadas(){
-  listaCompletadas.innerHTML='';
-  const creadores=[...new Set(completadas.map(m=>m.autor))]; filtroCreador.innerHTML=''; creadores.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; filtroCreador.appendChild(o); });
-  const completadores=[...new Set(completadas.map(m=>m.completadaPor))]; filtroCompletador.innerHTML=''; completadores.forEach(c=>{ const o=document.createElement('option'); o.value=c; o.textContent=c; filtroCompletador.appendChild(o); });
-
-  let visible=[...completadas];
-  if(filtroCreador.value) visible=visible.filter(m=>m.autor===filtroCreador.value);
-  if(filtroCompletador.value) visible=visible.filter(m=>m.completadaPor===filtroCompletador.value);
-  if(visible.length===0){ listaCompletadas.innerHTML='<p>No hay misiones completadas con esos criterios.</p>'; return; }
-  visible.forEach(m=>{
-    const card=document.createElement('div'); card.className='mision tomada';
-    card.innerHTML=`<h3>${m.titulo}</h3>
-      <p>🏷️ ${m.recurso} (${m.stack} stacks)</p>
-      <p>💰 ${m.oro} oro</p>
-      <p>👤 Creada por: ${m.autor}</p>
-      <p>✅ Completada por: <strong>${m.completadaPor}</strong></p>`;
-    listaCompletadas.appendChild(card);
+  Object.keys(botones).forEach((k) => {
+    botones[k].addEventListener("click", () => {
+      Object.values(secciones).forEach((s) => s.classList.remove("active"));
+      Object.values(botones).forEach((b) => b.classList.remove("active"));
+      secciones[k].classList.add("active");
+      botones[k].classList.add("active");
+      if (k === "ver") renderMisiones();
+      if (k === "completadas") renderCompletadas();
+    });
   });
-}
 
-// --------------------
-// FILTROS Y ORDEN
-// --------------------
-filtroRecurso.addEventListener('change',renderMisiones);
-ordenarBtn.addEventListener('click',()=>{ ordenarPorOro=!ordenarPorOro; ordenarBtn.textContent=ordenarPorOro?'🔽 Mostrar todas':'💰 Ordenar por recompensa'; renderMisiones(); });
-filtroCreador.addEventListener('change',renderCompletadas);
-filtroCompletador.addEventListener('change',renderCompletadas);
+  // ==========================
+  // RENDERIZAR MISIONES
+  // ==========================
+  function renderMisiones() {
+    listaMisiones.innerHTML = "";
+    let visible = [...misiones];
 
-function cerrarSesion() {
-  localStorage.removeItem("usuarioActual");
-  location.reload();
-}
+    if (filtroRecurso.value) {
+      visible = visible.filter((m) => m.recurso === filtroRecurso.value);
+    }
 
-// --------------------
-// RESET TEMPORAL
-// --------------------
-window.resetearDatos=function(){ localStorage.removeItem('misiones'); localStorage.removeItem('completadas'); localStorage.removeItem('users'); localStorage.removeItem('loggedUser'); alert('¡Datos reseteados! Recarga la página para empezar limpio.'); }
+    if (ordenarPorOro) {
+      visible.sort((a, b) => b.oro - a.oro);
+    }
 
-// Si ya estaba logueado
-if(loggedUser){ loginSec.style.display='none'; appSec.style.display='block'; inicializarFormMision(); actualizarUsuarioLogueadoUI(); renderMisiones(); renderCompletadas();}
+    if (visible.length === 0) {
+      listaMisiones.innerHTML = "<p>No hay misiones activas con esos criterios.</p>";
+      return;
+    }
 
+    visible.forEach((m) => {
+      const total = (recursos[m.recurso] || 0) * m.stack;
+      const card = document.createElement("div");
+      card.className = "mision" + (m.tomadoPor ? " tomada" : "");
+      card.innerHTML = `
+        <h3>${m.titulo}</h3>
+        <p>🏷️ Recurso: ${m.recurso} (${m.stack} stacks = ${total} unidades)</p>
+        <p>📅 Creada el: ${m.fecha}</p>
+        <p>👤 Autor: ${m.autor}</p>
+        ${m.tomadoPor ? `<p>⚒️ En curso por: <strong>${m.tomadoPor}</strong></p>` : ""}
+      `;
+
+      const btns = document.createElement("div");
+      btns.className = "botones-mision";
+
+      if (!m.tomadoPor) {
+        const takeBtn = document.createElement("button");
+        takeBtn.textContent = "🪓 Tomar";
+        takeBtn.addEventListener("click", () => {
+          m.tomadoPor = loggedUser;
+          guardar();
+          renderMisiones();
+        });
+        btns.appendChild(takeBtn);
+      } else {
+        const compBtn = document.createElement("button");
+        compBtn.textContent = "✅ Completar";
+        compBtn.addEventListener("click", () => {
+          completarMisionPorId(m.id);
+        });
+        btns.appendChild(compBtn);
+      }
+
+      const delBtn = document.createElement("button");
+      delBtn.textContent = "🗑️ Borrar";
+      delBtn.addEventListener("click", () => {
+        if (confirm("¿Borrar esta misión?")) {
+          misiones = misiones.filter((x) => x.id !== m.id);
+          guardar();
+          renderMisiones();
+        }
+      });
+      btns.appendChild(delBtn);
+
+      card.appendChild(btns);
+      listaMisiones.appendChild(card);
+    });
+  }
+
+  function completarMisionPorId(id) {
+    const idx = misiones.findIndex((x) => x.id === id);
+    if (idx === -1) return;
+    const m = misiones[idx];
+    m.completadaPor = loggedUser;
+    completadas.unshift(m);
+    misiones.splice(idx, 1);
+    guardar();
+    renderMisiones();
+    renderCompletadas();
+  }
+
+  function renderCompletadas() {
+    listaCompletadas.innerHTML = "";
+
+    const creadores = [...new Set(completadas.map((m) => m.autor))];
+    filtroCreador.innerHTML = '<option value="">Todos los creadores</option>';
+    creadores.forEach((c) => {
+      const o = document.createElement("option");
+      o.value = c;
+      o.textContent = c;
+      filtroCreador.appendChild(o);
+    });
+
+    const completadores = [...new Set(completadas.map((m) => m.completadaPor))];
+    filtroCompletador.innerHTML =
+      '<option value="">Todos los completadores</option>';
+    completadores.forEach((c) => {
+      const o = document.createElement("option");
+      o.value = c;
+      o.textContent = c;
+      filtroCompletador.appendChild(o);
+    });
+
+    let visible = [...completadas];
+    if (filtroCreador.value) {
+      visible = visible.filter((m) => m.autor === filtroCreador.value);
+    }
+    if (filtroCompletador.value) {
+      visible = visible.filter(
+        (m) => m.completadaPor === filtroCompletador.value
+      );
+    }
+
+    if (visible.length === 0) {
+      listaCompletadas.innerHTML =
+        "<p>No hay misiones completadas con esos criterios.</p>";
+      return;
+    }
+
+    visible.forEach((m) => {
+      const card = document.createElement("div");
+      card.className = "mision tomada";
+      card.innerHTML = `
+        <h3>${m.titulo}</h3>
+        <p>🏷️ ${m.recurso} (${m.stack} stacks)</p>
+        <p>💰 ${m.oro} oro</p>
+        <p>👤 Creada por: ${m.autor}</p>
+        <p>✅ Completada por: <strong>${m.completadaPor}</strong></p>
+      `;
+      listaCompletadas.appendChild(card);
+    });
+  }
+
+  // ==========================
+  // FILTROS Y ORDEN
+  // ==========================
+  filtroRecurso.addEventListener("change", renderMisiones);
+  ordenarBtn.addEventListener("click", () => {
+    ordenarPorOro = !ordenarPorOro;
+    ordenarBtn.textContent = ordenarPorOro
+      ? "🔽 Mostrar todas"
+      : "💰 Ordenar por recompensa";
+    renderMisiones();
+  });
+  filtroCreador.addEventListener("change", renderCompletadas);
+  filtroCompletador.addEventListener("change", renderCompletadas);
+
+  // ==========================
+  // CERRAR SESIÓN
+  // ==========================
+  async function cerrarSesion() {
+    try {
+      await supabaseClient.auth.signOut();
+    } catch (e) {
+      console.error(e);
+    }
+    loggedUser = null;
+    localStorage.removeItem("loggedUser");
+    actualizarUsuarioLogueadoUI();
+    appSec.style.display = "none";
+    loginSec.style.display = "block";
+  }
+
+  // la función tiene que ser global porque la llamás desde el HTML
+  window.cerrarSesion = cerrarSesion;
+
+  // ==========================
+  // RESET TEMPORAL (DEBUG)
+  // ==========================
+  window.resetearDatos = function () {
+    localStorage.removeItem("misiones");
+    localStorage.removeItem("completadas");
+    localStorage.removeItem("loggedUser");
+    alert(
+      "¡Datos reseteados! Recarga la página para empezar limpio (no afecta Supabase)."
+    );
+  };
+
+  // ==========================
+  // AL CARGAR LA PÁGINA
+  // ==========================
+  if (loggedUser) {
+    // ya había alguien logueado en este navegador
+    loginSec.style.display = "none";
+    registerSec.style.display = "none";
+    appSec.style.display = "block";
+    inicializarFormMision();
+    actualizarUsuarioLogueadoUI();
+    renderMisiones();
+    renderCompletadas();
+  } else {
+    // mostrar login por defecto
+    loginSec.style.display = "block";
+    registerSec.style.display = "none";
+    appSec.style.display = "none";
+  }
 </script>
 </body>
 </html>
+
 
