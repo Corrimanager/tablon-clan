@@ -4,26 +4,6 @@
     <meta charset="UTF-8">
     <title>Tablón del Clan - Pax Dei</title>
     <link rel="stylesheet" href="style.css">
-
-    <script type="module">
-        import { supabase } from "./supabase.js";
-
-        document.addEventListener("DOMContentLoaded", async () => {
-            const { data } = await supabase.auth.getSession();
-            if (!data.session) window.location.href = "login.html";
-
-            const user = data.session.user;
-            document.getElementById("userNameText").textContent =
-                (user.user_metadata?.nombre || user.email).toUpperCase();
-        });
-
-        async function logout() {
-            await supabase.auth.signOut();
-            window.location.href = "login.html";
-        }
-
-        window.logout = logout;
-    </script>
 </head>
 
 <body>
