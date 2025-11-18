@@ -2,55 +2,42 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Tablón del Clan</title>
-    <link rel="stylesheet" href="style.css">
-    <script defer src="js/supabase.js"></script>
+    <title>Login - Pax Dei</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
 </head>
-
 <body>
 
-<header>
-    <h1>📜 Tablón del Clan - Pax Dei</h1>
-</header>
-
-<!-- CONTENEDOR DE LOGIN -->
-<div class="login-container">
+<div class="login-box">
     <h2>LOGIN</h2>
 
-    <form id="loginForm">
-        <input type="email" id="email" placeholder="Correo (no usuario)" required>
-        <input type="password" id="password" placeholder="Contraseña" required>
+    <input id="loginEmail" type="email" placeholder="Correo (no usuario)">
+    <input id="loginPassword" type="password" placeholder="Contraseña">
 
-        <button type="submit">Ingresar</button>
-    </form>
+    <button onclick="login()">Ingresar</button>
 
     <p>¿No tienes cuenta? <a href="register.html">Regístrate</a></p>
 </div>
 
 <script>
-document.getElementById("loginForm").addEventListener("submit", async (e) => {
-    e.preventDefault();
-
-    const email = document.getElementById("email").value.trim();
-    const password = document.getElementById("password").value.trim();
+async function login() {
+    const email = document.getElementById("loginEmail").value;
+    const pass = document.getElementById("loginPassword").value;
 
     const { data, error } = await supabase.auth.signInWithPassword({
-        email: email,
-        password: password
+        email,
+        password: pass
     });
 
     if (error) {
-        alert(error.message);
+        alert("Error: " + error.message);
         return;
     }
 
-    // Guardar sesión en sessionStorage
-    sessionStorage.setItem("loggedUser", email);
-
-    // Redirigir al tablón
+    markLoginMoment();
     window.location.href = "index.html";
-});
+}
 </script>
 
 </body>

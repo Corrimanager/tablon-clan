@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Registro - Pax Dei</title>
+    <link rel="stylesheet" href="css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="js/supabase.js"></script>
+</head>
+<body>
+
+<div class="login-box">
+    <h2>REGISTRO</h2>
+
+    <input id="regEmail" type="email" placeholder="Correo">
+    <input id="regPassword" type="password" placeholder="Contraseña">
+
+    <button onclick="register()">Crear cuenta</button>
+
+    <p>¿Ya tienes cuenta? <a href="login.html">Ingresá aquí</a></p>
+</div>
+
+<script>
+async function register() {
+    const email = document.getElementById("regEmail").value;
+    const pass = document.getElementById("regPassword").value;
+
+    const { error } = await supabase.auth.signUp({
+        email,
+        password: pass
+    });
+
+    if (error) {
+        alert("Error: " + error.message);
+        return;
+    }
+
+    alert("Cuenta creada. Revisá tu mail y luego inicia sesión.");
+    window.location.href = "login.html";
+}
+</script>
+
+</body>
+</html>
