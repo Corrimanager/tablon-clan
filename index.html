@@ -11,6 +11,60 @@
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
+
+    <!-- Chequeo de sesión -->
+  <script>
+  document.addEventListener("DOMContentLoaded", async () => {
+      const { data } = await supabase.auth.getSession();
+
+      if (!data.session) {
+          window.location.href = "login.html";
+          return;
+      }
+
+      // Si está logueado, podés cargar el nombre del usuario
+      document.getElementById("userMenuText").innerText =
+          data.session.user.email.split("@")[0].toUpperCase();
+  });
+  </script>
+
+  <script>
+  // Si el usuario ya tiene sesión activa EN ESTA PESTAÑA,
+  // lo mando directo al index
+  document.addEventListener("DOMContentLoaded", async () => {
+      const { data } = await supabase.auth.getSession();
+      if (data.session) {
+          window.location.href = "index.html";
+      }
+  });
+
+  // LOGIN
+  async function loginUser() {
+      const email = document.getElementById("email").value;
+      const pass = document.getElementById("password").value;
+
+      let { error } = await supabase.auth.signInWithPassword({
+          email: email,
+          password: pass
+      });
+
+      if (error) {
+          alert("Error al iniciar sesión: " + error.message);
+          return;
+      }
+
+      window.location.href = "index.html";
+  }
+</script>
+
+<!-- FORMULARIO -->
+<div>
+   <input type="email" id="email" placeholder="Email" />
+   <input type="password" id="password" placeholder="Contraseña" />
+   <button onclick="loginUser()">Ingresar</button>
+</div>
+
+
   <header>
     <h1>📜 Tablón del Clan - Pax Dei</h1>
 
