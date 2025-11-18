@@ -3,46 +3,60 @@
 <head>
     <meta charset="UTF-8">
     <title>Login - Tablón del Clan</title>
+
+    <!-- CSS -->
     <link rel="stylesheet" href="style.css">
-    <script type="module">
-        import { supabase } from "./supabase.js";
 
-        document.addEventListener("DOMContentLoaded", async () => {
-            const { data } = await supabase.auth.getSession();
-            if (data.session) {
-                window.location.href = "index.html";
+    <!-- Supabase (SIEMPRE ANTES DE TU JS) -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+</head>
+
+<body>
+
+    <h1>LOGIN</h1>
+
+    <div class="login-box">
+        <input type="email" id="email" placeholder="Correo electrónico">
+        <input type="password" id="password" placeholder="Contraseña">
+        <button id="btnLogin">Ingresar</button>
+
+        <p>¿No tienes cuenta? <a href="register.html">Regístrate</a></p>
+    </div>
+
+    <script>
+        // Al hacer clic en Ingresar
+        document.getElementById("btnLogin").addEventListener("click", async () => {
+
+            const email = document.getElementById("email").value.trim();
+            const pass = document.getElementById("password").value.trim();
+
+            if (!email || !pass) {
+                alert("Completa todos los campos.");
+                return;
             }
-        });
-
-        async function login() {
-            const email = document.getElementById("email").value;
-            const pass = document.getElementById("password").value;
 
             const { data, error } = await supabase.auth.signInWithPassword({
-                email,
+                email: email,
                 password: pass
             });
 
-            if (error) return alert(error.message);
+            if (error) {
+                alert("Error: " + error.message);
+                return;
+            }
 
+            // Redirige al panel principal
             window.location.href = "index.html";
-        }
+        });
 
-        window.login = login;
+        // Si ya está logueado, redirigir a index directo
+        supabase.auth.getSession().then((res) => {
+            if (res.data.session) {
+                window.location.href = "index.html";
+            }
+        });
     </script>
-</head>
-<body>
-
-<div class="box">
-    <h2>LOGIN</h2>
-
-    <input type="email" id="email" placeholder="Correo" />
-    <input type="password" id="password" placeholder="Contraseña" />
-
-    <button onclick="login()">Ingresar</button>
-
-    <p>¿No tienes cuenta? <a href="register.html">Registrate</a></p>
-</div>
 
 </body>
 </html>
