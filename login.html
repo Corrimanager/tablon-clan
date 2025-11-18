@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Tablón del Clan</title>
+    <link rel="stylesheet" href="style.css">
+    <script defer src="js/supabase.js"></script>
+</head>
+
+<body>
+
+<header>
+    <h1>📜 Tablón del Clan - Pax Dei</h1>
+</header>
+
+<!-- CONTENEDOR DE LOGIN -->
+<div class="login-container">
+    <h2>LOGIN</h2>
+
+    <form id="loginForm">
+        <input type="email" id="email" placeholder="Correo (no usuario)" required>
+        <input type="password" id="password" placeholder="Contraseña" required>
+
+        <button type="submit">Ingresar</button>
+    </form>
+
+    <p>¿No tienes cuenta? <a href="register.html">Regístrate</a></p>
+</div>
+
+<script>
+document.getElementById("loginForm").addEventListener("submit", async (e) => {
+    e.preventDefault();
+
+    const email = document.getElementById("email").value.trim();
+    const password = document.getElementById("password").value.trim();
+
+    const { data, error } = await supabase.auth.signInWithPassword({
+        email: email,
+        password: password
+    });
+
+    if (error) {
+        alert(error.message);
+        return;
+    }
+
+    // Guardar sesión en sessionStorage
+    sessionStorage.setItem("loggedUser", email);
+
+    // Redirigir al tablón
+    window.location.href = "index.html";
+});
+</script>
+
+</body>
+</html>
