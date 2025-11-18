@@ -1,32 +1,25 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <meta charset="UTF-8" />
-  <title>Perfil del Usuario - Pax Dei</title>
+  <meta charset="UTF-8">
+  <title>Perfil</title>
   <link rel="stylesheet" href="css/estilos.css">
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 
 <body>
-<header>
-  <h1>👤 Perfil del Usuario</h1>
-  <a href="index.html" class="volver">⬅ Volver al Tablón</a>
-</header>
+  <a href="index.html">⬅ Volver</a>
+  <h1>Perfil del Usuario</h1>
 
-<section id="perfilContenedor">
   <div id="perfilCard">
-    <img id="avatarFoto" src="" alt="avatar del usuario">
+    <img id="avatarFoto" width="120">
     <h2 id="perfilNombre"></h2>
     <p id="perfilEmail"></p>
     <p id="perfilFecha"></p>
-
-    <div id="perfilStats">
-      <p>Misiones creadas: <span id="statsCreadas">0</span></p>
-      <p>Misiones completadas: <span id="statsCompletadas">0</span></p>
-    </div>
+    <p>Misiones creadas: <span id="statsCreadas"></span></p>
+    <p>Misiones completadas: <span id="statsCompletadas"></span></p>
   </div>
-</section>
 
-<script type="module" src="js/perfil.js"></script>
+  <script type="module" src="js/perfil.js"></script>
 </body>
 </html>

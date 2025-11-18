@@ -1,0 +1,252 @@
+@import url('https://fonts.googleapis.com/css2?family=Cinzel:wght@500&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=MedievalSharp&display=swap');
+
+body {
+  font-family: 'Cinzel', serif;
+  background: #3a2f23 url('https://www.transparenttextures.com/patterns/wood-pattern.png');
+  margin: 0;
+  color: #fdf5e6;
+  font-size: 17px;
+}
+
+/* HEADER + TÍTULO */
+header {
+  background: linear-gradient(#4b3a28, #2c1f12);
+  text-align: center;
+  padding: 25px;
+  border-bottom: 5px solid #2c1f12;
+  box-shadow: inset 0 0 30px rgba(0,0,0,0.6);
+  position: relative;
+}
+
+header h1 {
+  font-size: 2.3em;
+  color: #e0c28b;
+  text-shadow: 3px 3px #000;
+  margin: 0;
+}
+
+/* CONTENEDOR PRINCIPAL */
+main {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 20px;
+}
+
+/* NAV DE SECCIONES */
+nav {
+  margin-bottom: 20px;
+}
+
+nav button {
+  background: #6b4b2e;
+  color: #fdf5e6;
+  border: 2px solid #2c1f12;
+  padding: 10px 20px;
+  margin: 0 5px;
+  cursor: pointer;
+  border-radius: 8px;
+  font-weight: bold;
+  transition: 0.3s;
+  box-shadow: 0 3px 5px rgba(0,0,0,0.5);
+  font-size: 16px;
+}
+
+nav button:hover {
+  background: #8b643a;
+  transform: scale(1.05);
+}
+
+nav button.active {
+  background: #c49a5f;
+  color: #2c1f12;
+  border: 2px solid #f0e2b6;
+}
+
+/* SECCIONES (LOGIN, REGISTER, APP) */
+section {
+  display: none;
+  width: 100%;
+  max-width: 900px;
+  background: #f8ecd2 url('https://www.transparenttextures.com/patterns/aged-paper.png');
+  color: #2c1f12;
+  padding: 25px;
+  border-radius: 15px;
+  border: 4px solid #2c1f12;
+  box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+  animation: fadeIn 0.5s ease-in-out;
+  box-sizing: border-box;
+}
+
+section.active {
+  display: block;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: scale(0.98); }
+  to   { opacity: 1; transform: scale(1); }
+}
+
+/* FORMULARIOS */
+label {
+  font-weight: bold;
+  color: #2c1f12;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 8px;
+  margin-bottom: 10px;
+  font-family: 'Cinzel', serif;
+  background: #f5e3b3;
+  border: 2px solid #2c1f12;
+  border-radius: 5px;
+  color: #2c1f12;
+  font-size: 17px;
+  box-sizing: border-box;
+}
+
+button.submit {
+  background: #c49a5f;
+  color: #2c1f12;
+  border: 2px solid #f0e2b6;
+  padding: 10px 15px;
+  border-radius: 8px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: 0.3s;
+  font-size: 16px;
+}
+
+button.submit:hover {
+  background: #d8b36e;
+  transform: scale(1.05);
+}
+
+/* TARJETAS DE MISIONES */
+.mision {
+  background: #f5e3b3;
+  border: 3px solid #2c1f12;
+  border-radius: 10px;
+  padding: 15px;
+  margin-bottom: 15px;
+  color: #2c1f12;
+  box-shadow: 0 0 10px rgba(0,0,0,0.4);
+  transition: 0.3s;
+  font-size: 17px;
+}
+
+.mision:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 0 15px rgba(0,0,0,0.6);
+}
+
+.mision.tomada {
+  background: #d6c08a;
+}
+
+.mision h3 {
+  margin-top: 0;
+  color: #3b2a1a;
+  font-size: 1.4em;
+}
+
+.recompensa {
+  color: #a67c00;
+  font-weight: bold;
+}
+
+.botones-mision button {
+  background: #6b4b2e;
+  color: #fdf5e6;
+  border: 2px solid #2c1f12;
+  padding: 6px 10px;
+  border-radius: 5px;
+  cursor: pointer;
+  margin-right: 6px;
+  transition: 0.2s;
+  font-size: 15px;
+}
+
+.botones-mision button:hover {
+  background: #8b643a;
+}
+
+/* TÍTULOS */
+h2 {
+  font-size: 1.7em;
+  text-align: center;
+  color: #2c1f12;
+  border-bottom: 2px solid #c49a5f;
+  padding-bottom: 5px;
+  letter-spacing: 1px;
+}
+
+/* FILTROS */
+.filtros {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 15px;
+  align-items: center;
+}
+
+.filtros select,
+.filtros button {
+  font-size: 16px;
+  padding: 7px 12px;
+}
+
+/* TEXTO USUARIO LOGUEADO (lo podemos usar o esconder) */
+#usuarioLogueado {
+  margin-bottom: 15px;
+  font-weight: bold;
+}
+
+/* MENÚ DE USUARIO (DESPLEGABLE) */
+#userMenuContainer {
+  position: absolute;
+  top: 15px;
+  left: 15px;
+  cursor: pointer;
+  color: #e0c28b;
+  font-family: 'Cinzel', serif;
+  font-size: 16px;
+}
+
+#userMenuButton {
+  background: rgba(0,0,0,0.4);
+  padding: 6px 12px;
+  border: 2px solid #c49a5f;
+  border-radius: 8px;
+}
+
+#userMenuDropdown {
+  display: none;
+  position: absolute;
+  top: 40px;
+  left: 0;
+  background: #3a2f23;
+  border: 2px solid #c49a5f;
+  border-radius: 10px;
+  padding: 8px;
+  z-index: 999;
+}
+
+#userMenuDropdown button {
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 8px;
+  text-align: left;
+  font-size: 15px;
+  color: #e0c28b;
+  cursor: pointer;
+}
+
+#userMenuDropdown button:hover {
+  background: rgba(255,255,255,0.1);
+}
