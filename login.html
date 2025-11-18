@@ -2,43 +2,47 @@
 <html lang="es">
 <head>
     <meta charset="UTF-8">
-    <title>Login - Pax Dei</title>
-    <link rel="stylesheet" href="css/style.css">
-    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <script src="js/supabase.js"></script>
+    <title>Login - Tablón del Clan</title>
+    <link rel="stylesheet" href="style.css">
+    <script type="module">
+        import { supabase } from "./supabase.js";
+
+        document.addEventListener("DOMContentLoaded", async () => {
+            const { data } = await supabase.auth.getSession();
+            if (data.session) {
+                window.location.href = "index.html";
+            }
+        });
+
+        async function login() {
+            const email = document.getElementById("email").value;
+            const pass = document.getElementById("password").value;
+
+            const { data, error } = await supabase.auth.signInWithPassword({
+                email,
+                password: pass
+            });
+
+            if (error) return alert(error.message);
+
+            window.location.href = "index.html";
+        }
+
+        window.login = login;
+    </script>
 </head>
 <body>
 
-<div class="login-box">
+<div class="box">
     <h2>LOGIN</h2>
 
-    <input id="loginEmail" type="email" placeholder="Correo (no usuario)">
-    <input id="loginPassword" type="password" placeholder="Contraseña">
+    <input type="email" id="email" placeholder="Correo" />
+    <input type="password" id="password" placeholder="Contraseña" />
 
     <button onclick="login()">Ingresar</button>
 
-    <p>¿No tienes cuenta? <a href="register.html">Regístrate</a></p>
+    <p>¿No tienes cuenta? <a href="register.html">Registrate</a></p>
 </div>
-
-<script>
-async function login() {
-    const email = document.getElementById("loginEmail").value;
-    const pass = document.getElementById("loginPassword").value;
-
-    const { data, error } = await supabase.auth.signInWithPassword({
-        email,
-        password: pass
-    });
-
-    if (error) {
-        alert("Error: " + error.message);
-        return;
-    }
-
-    markLoginMoment();
-    window.location.href = "index.html";
-}
-</script>
 
 </body>
 </html>

@@ -2,24 +2,26 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Perfil</title>
-  <link rel="stylesheet" href="css/estilos.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="style.css">
+  <script type="module">
+    import { supabase } from "./supabase.js";
+
+    document.addEventListener("DOMContentLoaded", async () => {
+        const { data } = await supabase.auth.getSession();
+        if (!data.session) return window.location.href="login.html";
+
+        const user = data.session.user;
+        document.getElementById("nombre").textContent = user.user_metadata?.nombre || "Sin nombre";
+        document.getElementById("correo").textContent = user.email;
+    });
+  </script>
 </head>
-
 <body>
-  <a href="index.html">⬅ Volver</a>
-  <h1>Perfil del Usuario</h1>
-
-  <div id="perfilCard">
-    <img id="avatarFoto" width="120">
-    <h2 id="perfilNombre"></h2>
-    <p id="perfilEmail"></p>
-    <p id="perfilFecha"></p>
-    <p>Misiones creadas: <span id="statsCreadas"></span></p>
-    <p>Misiones completadas: <span id="statsCompletadas"></span></p>
+  <div class="box">
+    <h2>Perfil</h2>
+    <p>Nombre: <span id="nombre"></span></p>
+    <p>Correo: <span id="correo"></span></p>
+    <button onclick="window.location.href='index.html'">Volver</button>
   </div>
-
-  <script type="module" src="js/perfil.js"></script>
 </body>
 </html>

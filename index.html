@@ -1,245 +1,82 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>🪵 Tablón del Clan - Pax Dei</title>
+    <meta charset="UTF-8">
+    <title>Tablón del Clan - Pax Dei</title>
+    <link rel="stylesheet" href="style.css">
 
-  <!-- CSS externo -->
-  <link rel="stylesheet" href="style.css">
+    <script type="module">
+        import { supabase } from "./supabase.js";
 
-  <!-- Supabase -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+        document.addEventListener("DOMContentLoaded", async () => {
+            const { data } = await supabase.auth.getSession();
+            if (!data.session) window.location.href = "login.html";
+
+            const user = data.session.user;
+            document.getElementById("userNameText").textContent =
+                (user.user_metadata?.nombre || user.email).toUpperCase();
+        });
+
+        async function logout() {
+            await supabase.auth.signOut();
+            window.location.href = "login.html";
+        }
+
+        window.logout = logout;
+    </script>
 </head>
 
 <body>
-
-<!-- ============================
-     CONFIGURACIÓN SUPABASE
-============================== -->
-<script>
-const SUPABASE_URL = "https://ipwxzkdpgbwgdeflzaks.supabase.co";
-const SUPABASE_ANON_KEY =
-"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlwd3h6a2RwZ2J3Z2RlZmx6YWtzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI4MTQ4NDksImV4cCI6MjA3ODM5MDg0OX0.LwtXhr_AY-6f09thVqaUSiop2YvqEEc4X5Vg1-jZQvQ";
-
-const { createClient } = supabase;
-const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-</script>
-
-
-<!-- ============================
-     REDIRECCIÓN AL LOGIN SI NO HAY SESIÓN
-============================== -->
-<script>
-document.addEventListener("DOMContentLoaded", async () => {
-    const { data } = await supabaseClient.auth.getSession();
-    if (!data.session) {
-        window.location.href = "login.html";
-    }
-});
-</script>
-
-
-<!-- ============================
-     HEADER + MENÚ DE USUARIO
-============================== -->
 <header>
     <h1>📜 Tablón del Clan - Pax Dei</h1>
 
-    <div id="userMenuContainer" style="display:none;">
-        <div id="userMenuButton">
-            <span id="userNameText"></span> ▼
-        </div>
+    <div id="userMenuContainer">
+        <div id="userMenuButton"> <span id="userNameText"></span> ▼ </div>
 
         <div id="userMenuDropdown">
-            <button id="menuPerfil">👤 Perfil</button>
-            <button id="menuHistorial">📜 Historial</button>
-            <button id="menuLogout">🚪 Cerrar sesión</button>
+            <button onclick="window.location.href='perfil.html'">👤 Perfil</button>
+            <button onclick="window.location.href='historial.html'">📜 Historial</button>
+            <button onclick="logout()">🚪 Cerrar sesión</button>
         </div>
     </div>
 </header>
 
+<!-- MENÚ USUARIO -->
+<script>
+document.getElementById("userMenuButton").addEventListener("click", () => {
+    const m = document.getElementById("userMenuDropdown");
+    m.style.display = m.style.display === "block" ? "none" : "block";
+});
+</script>
 
-<!-- ============================
-     ÁREA DE LA APP (solo si logueado)
-============================== -->
-<main id="app" style="display:none;">
-
+<!-- APP -->
+<main>
     <nav>
-      <button id="btn-crear" class="active">➕ Crear Misión</button>
-      <button id="btn-ver">📜 Ver Misiones</button>
-      <button id="btn-completadas">✅ Completadas</button>
+        <button id="btn-crear" class="active">Crear misión</button>
+        <button id="btn-ver">Ver misiones</button>
+        <button id="btn-completadas">Completadas</button>
     </nav>
 
-    <!-- CREAR MISIÓN -->
     <section id="crear" class="active">
-      <form id="formMision">
-          <input type="text" id="titulo" placeholder="Título automático" readonly>
-
-          <label>Recurso necesario:</label>
-          <div class="fila">
-              <select id="stacks"></select>
-              <select id="recurso"></select>
-          </div>
-
-          <input type="number" id="oro" placeholder="Recompensa en oro">
-          <input type="text" id="autor" readonly>
-
-          <button type="submit">📜 Agregar misión</button>
-      </form>
+        <form id="formMision">
+            <input id="titulo" placeholder="Título" readonly>
+            <select id="stacks"></select>
+            <select id="recurso"></select>
+            <input id="oro" type="number" placeholder="Oro">
+            <button type="submit">Guardar</button>
+        </form>
     </section>
 
-    <!-- MISONES ACTIVAS -->
     <section id="ver">
-        <h2>Misiones Activas</h2>
-
-        <div class="filtros">
-            <select id="filtroRecurso"></select>
-            <button id="ordenarOro">💰 Ordenar por oro</button>
-        </div>
-
         <div id="listaMisiones"></div>
     </section>
 
-    <!-- COMPLETADAS -->
     <section id="completadas">
-        <h2>Misiones Completadas</h2>
-
-        <div class="filtros">
-            <select id="filtroCreador"></select>
-            <select id="filtroCompletador"></select>
-        </div>
-
         <div id="listaCompletadas"></div>
     </section>
-
 </main>
 
-
-<!-- ============================
-     LÓGICA PRINCIPAL (SIN LOGIN)
-============================== -->
-<script>
-// Tu lógica original SIN login integrado.
-// Se conserva toda la funcionalidad de misiones.
-
-let misiones = JSON.parse(localStorage.getItem("misiones")) || [];
-let completadas = JSON.parse(localStorage.getItem("completadas")) || [];
-let loggedUser = localStorage.getItem("loggedUser") || null;
-
-const recursos = { Albura: 50, Arcilla: 100, Juncos: 75, Piedra: 100 };
-
-// ==================
-// DOM
-// ==================
-const appSec = document.getElementById("app");
-const userMenuContainer = document.getElementById("userMenuContainer");
-const userMenuButton = document.getElementById("userMenuButton");
-const userMenuDropdown = document.getElementById("userMenuDropdown");
-const userNameText = document.getElementById("userNameText");
-
-const form = document.getElementById("formMision");
-const titulo = document.getElementById("titulo");
-const stacksSel = document.getElementById("stacks");
-const recursoSel = document.getElementById("recurso");
-const oroInput = document.getElementById("oro");
-const autorInput = document.getElementById("autor");
-
-const listaMisiones = document.getElementById("listaMisiones");
-const listaCompletadas = document.getElementById("listaCompletadas");
-
-
-// ==================
-// Mostrar usuario logueado
-// ==================
-function mostrarUsuario() {
-    if (!loggedUser) return;
-    userMenuContainer.style.display = "block";
-    userNameText.textContent = loggedUser;
-}
-
-
-// ==================
-// Inicializar app
-// ==================
-document.addEventListener("DOMContentLoaded", async () => {
-    const { data } = await supabaseClient.auth.getSession();
-    if (data.session) {
-        loggedUser = data.session.user.email.split("@")[0].toUpperCase();
-        localStorage.setItem("loggedUser", loggedUser);
-
-        autorInput.value = loggedUser;
-        appSec.style.display = "block";
-        mostrarUsuario();
-
-        inicializarForm();
-        renderMisiones();
-        renderCompletadas();
-    }
-});
-
-
-// ==================
-// Inicializar formulario
-// ==================
-function inicializarForm() {
-    stacksSel.innerHTML = "<option value=''>Stacks</option>";
-    for (let i = 1; i <= 36; i++) {
-        stacksSel.innerHTML += `<option value="${i}">${i}</option>`;
-    }
-
-    recursoSel.innerHTML = "<option value=''>Selecciona un recurso</option>";
-    Object.keys(recursos).forEach(r => {
-        recursoSel.innerHTML += `<option value="${r}">${r}</option>`;
-    });
-}
-
-
-// ==================
-// Crear Misión
-// ==================
-form.addEventListener("submit", (e) => {
-    e.preventDefault();
-    if (!titulo.value) {
-        alert("Completa stack y recurso");
-        return;
-    }
-
-    const nueva = {
-        id: Date.now(),
-        titulo: titulo.value,
-        stack: stacksSel.value,
-        recurso: recursoSel.value,
-        oro: oroInput.value,
-        autor: loggedUser,
-        fecha: new Date().toLocaleDateString(),
-        tomadoPor: null,
-    };
-
-    misiones.unshift(nueva);
-    localStorage.setItem("misiones", JSON.stringify(misiones));
-
-    form.reset();
-    titulo.value = "";
-    inicializarForm();
-    renderMisiones();
-});
-
-
-// ==================
-// Redirigir desde el menú
-// ==================
-document.getElementById("menuPerfil").onclick = () => {
-    window.location.href = "perfil.html";
-};
-document.getElementById("menuHistorial").onclick = () => {
-    window.location.href = "historial.html";
-};
-document.getElementById("menuLogout").onclick = async () => {
-    await supabaseClient.auth.signOut();
-    localStorage.clear();
-    window.location.href = "login.html";
-};
-</script>
+<script src="app.js"></script>
 
 </body>
 </html>

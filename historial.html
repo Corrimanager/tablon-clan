@@ -2,17 +2,30 @@
 <html>
 <head>
   <meta charset="UTF-8">
-  <title>Historial</title>
-  <link rel="stylesheet" href="css/estilos.css">
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <link rel="stylesheet" href="style.css">
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const completadas = JSON.parse(localStorage.getItem("completadas")) || [];
+        const cont = document.getElementById("hist");
+
+        completadas.forEach(m => {
+            cont.innerHTML += `
+                <div class="mision">
+                    <h3>${m.titulo}</h3>
+                    <p>Recurso: ${m.recurso}</p>
+                    <p>Stacks: ${m.stack}</p>
+                </div>`;
+        });
+    });
+  </script>
 </head>
-
 <body>
-  <a href="index.html">⬅ Volver</a>
-  <h1>Historial de Misiones</h1>
 
-  <div id="listaHistorial"></div>
+  <div class="box" style="width:80%">
+    <h2>Historial de Misiones</h2>
+    <div id="hist"></div>
+    <button onclick="window.location.href='index.html'">Volver</button>
+  </div>
 
-  <script type="module" src="js/historial.js"></script>
 </body>
 </html>
