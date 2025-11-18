@@ -250,3 +250,102 @@ h2 {
 #userMenuDropdown button:hover {
   background: rgba(255,255,255,0.1);
 }
+
+/* ================================
+   LOGIN / REGISTRO
+================================ */
+
+#authContainer {
+    width: 450px;
+    margin: 50px auto;
+    background: #f5e6c8;
+    padding: 25px;
+    border-radius: 10px;
+    border: 3px solid #8a6a34;
+    box-shadow: 0 0 15px rgba(0,0,0,0.4);
+}
+
+#authContainer h2 {
+    text-align: center;
+    margin-bottom: 20px;
+    font-size: 28px;
+}
+
+#authContainer input {
+    width: 100%;
+    padding: 12px;
+    margin-top: 10px;
+    border: 2px solid #8a6a34;
+    font-size: 16px;
+    border-radius: 5px;
+    background: #fff5d8;
+}
+
+#authContainer button {
+    margin-top: 18px;
+    width: 100%;
+    padding: 12px;
+    background: #8a6a34;
+    color: white;
+    font-size: 18px;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+}
+
+#authContainer button:hover {
+    background: #6d5326;
+}
+
+/* ================================
+   MENÚ USUARIO
+================================ */
+
+#userMenuButton {
+    cursor: pointer;
+    padding: 10px;
+    background: #8a6a34;
+    color: white;
+    border-radius: 5px;
+    margin: 10px;
+    position: absolute;
+    top: 10px;
+    left: 10px;
+}
+
+#userMenuDropdown {
+    display: none;
+    position: absolute;
+    top: 50px;
+    left: 10px;
+    background: #f5e6c8;
+    border: 3px solid #8a6a34;
+    padding: 15px;
+    border-radius: 10px;
+    z-index: 999;
+}
+
+#userMenuDropdown button {
+    width: 100%;
+    padding: 10px;
+    margin-top: 8px;
+    font-size: 16px;
+    background: #8a6a34;
+    color: white;
+    border-radius: 5px;
+    border: none;
+    cursor: pointer;
+}
+
+#userMenuDropdown button:hover {
+    background: #6d5326;
+}
+
+
+/* ================================
+   CONTENIDO PRINCIPAL OCULTO
+================================ */
+
+#mainContent {
+    display: none;
+}
