@@ -4,6 +4,10 @@
     <meta charset="UTF-8">
     <title>Tablón del Clan - Pax Dei</title>
     <link rel="stylesheet" href="style.css">
+
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="supabase.js"></script>
+    <script src="app.js"></script>
 </head>
 
 <body>
@@ -16,7 +20,8 @@
         <div id="userMenuDropdown">
             <button onclick="window.location.href='perfil.html'">👤 Perfil</button>
             <button onclick="window.location.href='historial.html'">📜 Historial</button>
-            <button onclick="cerrarSesion()">🚪 Cerrar sesión</button>
+            <button id="btnLogout">🚪 Cerrar sesión</button>
+
         </div>
     </div>
 </header>
@@ -55,8 +60,5 @@ document.getElementById("userMenuButton").addEventListener("click", () => {
         <div id="listaCompletadas"></div>
     </section>
 </main>
-
-<script src="app.js"></script>
-
 </body>
 </html>

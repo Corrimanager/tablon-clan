@@ -92,6 +92,20 @@ function renderCompletadas() {
     });
 }
 
+async function cerrarSesion() {
+    try {
+        await supabase.auth.signOut();
+    } catch (e) {
+        console.error("Error cerrando sesión:", e);
+    }
+
+    localStorage.clear();
+    window.location.href = "login.html";
+}
+
+window.cerrarSesion = cerrarSesion;
+
+
 inicializarForm();
 renderMisiones();
 renderCompletadas();
