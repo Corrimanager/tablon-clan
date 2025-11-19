@@ -84,7 +84,7 @@
 </div>
 <div id="listaCompletadas"></div>
 </section>
-
+</body>
 <script>
   // ==========================
   // CONFIGURACIÓN SUPABASE
@@ -248,41 +248,66 @@
   // REGISTRO CON SUPABASE
   // ==========================
   btnRegister.addEventListener("click", async () => {
-    const nombre = regUser.value.trim();
-    const email = regEmail.value.trim();
-    const pass = regPass.value.trim();
+    console.log("🔵 EVENTO DE REGISTRO EJECUTADO");
+  const nombre = regUser.value.trim();
+  const email = regEmail.value.trim();
+  const pass = regPass.value.trim();
 
-    if (!nombre || !email || !pass) {
-      alert("Por favor completá todos los campos.");
+  if (!nombre || !email || !pass) {
+    alert("Por favor completá todos los campos.");
+    return;
+  }
+
+  try {
+    // 1. REGISTRO EN SUPABASE AUTH
+    const { data, error } = await supabaseClient.auth.signUp({
+      email: email,
+      password: pass,
+      options: {
+        data: { nombre } // esto queda como metadata en Auth
+      },
+    });
+
+    if (error) {
+      console.error(error);
+      alert(error.message || "Error al registrar usuario.");
       return;
     }
 
-    try {
-      const { data, error } = await supabaseClient.auth.signUp({
-        email,
-        password: pass,
-        options: {
-          data: { nombre }, // se guarda como metadata del usuario
-        },
-      });
+    // 2. GUARDAR USUARIO EN LA TABLA "usuarios"
+    if (data && data.user) {
+      console.log("🟢 DATA.USER EXISTE, INSERTARÉ EN LA BASE: ", data.user.id);
+      const { error: insertError } = await supabaseClient
+        .from("usuarios")
+        .insert([
+          {
+            auth_id: data.user.id,
+            nombre: nombre,
+            email: email,
+            rol: "jugador" // rol por defecto
+          }
+        ]);
 
-      if (error) {
-        console.error(error);
-        alert(error.message || "Error al registrar usuario.");
+      if (insertError) {
+        console.error("🔴 Error insertando usuario:", insertError);
+        console.error("Error insertando usuario en tabla usuarios:", insertError);
+        alert("Error guardando datos en la base de usuarios.");
         return;
       }
-
-      alert("Usuario registrado. Ahora podés iniciar sesión.");
-      regUser.value = "";
-      regEmail.value = "";
-      regPass.value = "";
-      registerSec.style.display = "none";
-      loginSec.style.display = "block";
-    } catch (err) {
-      console.error(err);
-      alert("Error de conexión con Supabase.");
     }
-  });
+
+    alert("Usuario registrado. Ahora podés iniciar sesión.");
+    regUser.value = "";
+    regEmail.value = "";
+    regPass.value = "";
+    registerSec.style.display = "none";
+    loginSec.style.display = "block";
+
+  } catch (err) {
+    console.error(err);
+    alert("Error de conexión con Supabase.");
+  }
+});
 
   // ==========================
   // LOGIN CON SUPABASE
@@ -696,7 +721,6 @@
     }
   })();
 </script>
-</body>
 </html>
 
 
