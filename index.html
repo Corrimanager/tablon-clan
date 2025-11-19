@@ -635,10 +635,6 @@ const perfilSec = document.getElementById("perfilSec");  // ← ESTA LÍNEA ERA 
       visible = visible.filter((m) => m.recurso === filtroRecurso.value);
     }
 
-    if (ordenarPorOro) {
-      visible.sort((a, b) => b.oro - a.oro);
-    }
-
     if (visible.length === 0) {
       listaMisiones.innerHTML = "<p>No hay misiones activas con esos criterios.</p>";
       return;
