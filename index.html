@@ -2,8 +2,8 @@
 <html lang="es">
 <head>
 <meta charset="UTF-8" />
-<title>🪵 Tablón del Clan - Pax Dei</title>
 <link rel="stylesheet" href="style.css"> 
+<title>🪵 Tablón del Clan - Pax Dei</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
 <body>
@@ -195,6 +195,9 @@ const perfilSec = document.getElementById("perfilSec");  // ← ESTA LÍNEA ERA 
   }
 
       const menuPerfil = document.getElementById("menuPerfil");
+      menuPerfil.addEventListener("click", () => {
+  alert("Estamos trabajando en la construcción del perfil del jugador. ¡Pronto estará disponible! 🛠️");
+});
 
         menuPerfil.addEventListener("click", () => {
         console.log("Abriendo perfil...");
