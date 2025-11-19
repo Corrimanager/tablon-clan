@@ -134,40 +134,41 @@
   // ==========================
   // REFERENCIAS AL DOM
   // ==========================
-  const loginSec = document.getElementById("login");
-  const registerSec = document.getElementById("register");
-  const appSec = document.getElementById("app");
+const loginSec = document.getElementById("login");
+const registerSec = document.getElementById("register");
+const appSec = document.getElementById("app");
 
-  const loginUser = document.getElementById("loginUser");
-  const loginPass = document.getElementById("loginPass");
-  const regUser = document.getElementById("regUser");
-  const regPass = document.getElementById("regPass");
-  const regEmail = document.getElementById("regEmail");
-  const btnLogin = document.getElementById("btnLogin");
-  const btnRegister = document.getElementById("btnRegister");
-  const showRegister = document.getElementById("showRegister");
-  const showLogin = document.getElementById("showLogin");
-  const usuarioLogueado = document.getElementById("usuarioLogueado");
+const loginUser = document.getElementById("loginUser");
+const loginPass = document.getElementById("loginPass");
+const regUser = document.getElementById("regUser");
+const regPass = document.getElementById("regPass");
+const regEmail = document.getElementById("regEmail");
+const btnLogin = document.getElementById("btnLogin");
+const btnRegister = document.getElementById("btnRegister");
+const showRegister = document.getElementById("showRegister");
+const showLogin = document.getElementById("showLogin");
+const usuarioLogueado = document.getElementById("usuarioLogueado");
 
-  const form = document.getElementById("formMision");
-  const titulo = document.getElementById("titulo");
-  const stacksSel = document.getElementById("stacks");
-  const recursoSel = document.getElementById("recurso");
-  const oroInput = document.getElementById("oro");
-  const autorInput = document.getElementById("autor");
-  const filtroRecurso = document.getElementById("filtroRecurso");
-  const ordenarBtn = document.getElementById("ordenarOro");
-  const listaMisiones = document.getElementById("listaMisiones");
-  const listaCompletadas = document.getElementById("listaCompletadas");
-  const filtroCreador = document.getElementById("filtroCreador");
-  const filtroCompletador = document.getElementById("filtroCompletador");
+const form = document.getElementById("formMision");
+const titulo = document.getElementById("titulo");
+const stacksSel = document.getElementById("stacks");
+const recursoSel = document.getElementById("recurso");
+const oroInput = document.getElementById("oro");
+const autorInput = document.getElementById("autor");
+const filtroRecurso = document.getElementById("filtroRecurso");
+const ordenarBtn = document.getElementById("ordenarOro");
+const listaMisiones = document.getElementById("listaMisiones");
+const listaCompletadas = document.getElementById("listaCompletadas");
+const filtroCreador = document.getElementById("filtroCreador");
+const filtroCompletador = document.getElementById("filtroCompletador");
 
-  const userMenuContainer = document.getElementById("userMenuContainer");
-  const userMenuButton = document.getElementById("userMenuButton");
-  const userMenuDropdown = document.getElementById("userMenuDropdown");
-  const userNameText = document.getElementById("userNameText");
+const userMenuContainer = document.getElementById("userMenuContainer");
+const userMenuButton = document.getElementById("userMenuButton");
+const userMenuDropdown = document.getElementById("userMenuDropdown");
+const userNameText = document.getElementById("userNameText");
 
-  let ordenarPorOro = false;
+const perfilSec = document.getElementById("perfilSec");
+
 
   // ==========================
   // UTILIDADES GENERALES
@@ -192,7 +193,6 @@
   }
 
       const menuPerfil = document.getElementById("menuPerfil");
-    const perfilSec = document.getElementById("perfilSec");
 
         menuPerfil.addEventListener("click", () => {
       appSec.style.display = "none";
