@@ -84,6 +84,33 @@
 </div>
 <div id="listaCompletadas"></div>
 </section>
+
+<section id="perfilSec" style="display:none; padding:20px;">
+  <h2>Perfil del Jugador</h2>
+
+  <div class="perfil-card" style="
+      background:#2d2d2d;
+      color:white;
+      padding:20px;
+      border-radius:10px;
+      margin-bottom:20px;
+      max-width:400px;
+  ">
+    <p><strong>Nombre:</strong> <span id="perfilNombre"></span></p>
+    <p><strong>Email:</strong> <span id="perfilEmail"></span></p>
+    <p><strong>Rol:</strong> <span id="perfilRol"></span></p>
+    <p><strong>Miembro desde:</strong> <span id="perfilFecha"></span></p>
+
+    <h3>Estadísticas</h3>
+    <p><strong>Misiones creadas:</strong> <span id="perfilCreadas"></span></p>
+    <p><strong>Misiones completadas:</strong> <span id="perfilCompletadas"></span></p>
+    <p><strong>Total de stacks recolectados:</strong> <span id="perfilStacks"></span></p>
+    <p><strong>Oro generado:</strong> <span id="perfilOro"></span></p>
+  </div>
+
+  <button id="volverApp">Volver</button>
+</section>
+
 <script>
   // ==========================
   // CONFIGURACIÓN SUPABASE
@@ -162,6 +189,84 @@
       userNameText.textContent = "";
     }
   }
+
+      const menuPerfil = document.getElementById("menuPerfil");
+    const perfilSec = document.getElementById("perfilSec");
+
+    menuPerfil.addEventListener("click", () => {
+      appSec.style.display = "none";
+      perfilSec.style.display = "block";
+      cargarPerfil(); // cargamos los datos del usuario
+    });
+
+        const volverApp = document.getElementById("volverApp");
+
+    volverApp.addEventListener("click", () => {
+      perfilSec.style.display = "none";
+      appSec.style.display = "block";
+    });
+
+      async function cargarPerfil() {
+      const { data: sessionData } = await supabaseClient.auth.getSession();
+      const authUser = sessionData.session.user;
+
+      const { data: perfil, error } = await supabaseClient
+        .from("usuarios")
+        .select("*")
+        .eq("auth_id", authUser.id)
+        .single();
+
+      if (error) {
+        console.error("Error cargando perfil:", error);
+        return;
+      }
+
+      // Datos básicos
+      document.getElementById("perfilNombre").textContent = perfil.nombre;
+      document.getElementById("perfilEmail").textContent = perfil.email;
+      document.getElementById("perfilRol").textContent = perfil.rol;
+      document.getElementById("perfilFecha").textContent = new Date(perfil.creado_el).toLocaleDateString();
+
+      // Ahora estadísticas
+      cargarEstadisticas(perfil.nombre);
+    }
+
+    async function cargarEstadisticas(nombre) {
+      // Misiones creadas
+      const { count: creadas } = await supabaseClient
+        .from("misiones")
+        .select("*", { count: "exact" })
+        .eq("autor", nombre);
+
+      // Misiones completadas
+      const { count: completadas } = await supabaseClient
+        .from("misiones")
+        .select("*", { count: "exact" })
+        .eq("completada_por", nombre);
+
+      // Oro total generado
+      const { data: misionesCompletadas } = await supabaseClient
+        .from("misiones")
+        .select("oro, stacks, recurso")
+        .eq("completada_por", nombre);
+
+      let totalOro = 0;
+      let totalStacks = 0;
+
+      if (misionesCompletadas) {
+        misionesCompletadas.forEach(m => {
+          totalOro += m.oro;
+          totalStacks += m.stacks;
+        });
+      }
+
+      // Mostrar en pantalla
+      document.getElementById("perfilCreadas").textContent = creadas;
+      document.getElementById("perfilCompletadas").textContent = completadas;
+      document.getElementById("perfilOro").textContent = totalOro;
+      document.getElementById("perfilStacks").textContent = totalStacks;
+    }
+
 
   function inicializarFormMision() {
     // Stacks
