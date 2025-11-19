@@ -194,17 +194,18 @@ const perfilSec = document.getElementById("perfilSec");  // ← ESTA LÍNEA ERA 
       const menuPerfil = document.getElementById("menuPerfil");
 
         menuPerfil.addEventListener("click", () => {
-      appSec.style.display = "none";
-      perfilSec.style.display = "block";
-      cargarPerfil();  // <- trae los datos reales desde Supabase
-    });
+        console.log("Abriendo perfil...");
+        appSec.style.display = "none";
+        perfilSec.style.display = "block";
+        cargarPerfil();
+      });
 
             const volverApp = document.getElementById("volverApp");
 
       volverApp.addEventListener("click", () => {
-      perfilSec.style.display = "none";
-      appSec.style.display = "block";
-    });
+        perfilSec.style.display = "none";
+        appSec.style.display = "block";
+      });
 
           async function cargarPerfil() {
       const { data: sessionData } = await supabaseClient.auth.getSession();
