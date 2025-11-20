@@ -135,9 +135,40 @@
   const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
   // ==========================
-  // DATOS EN MEMORIA
+  // DATOS EN MEMORIA DESDE SUPABASE (BASE DE DATOS - RECURSOS)
   // ==========================
-  const recursos = { Albura: 50, Arcilla: 100, Juncos: 75, Piedra: 100 };
+ let recursos = {};
+
+async function cargarRecursos() {
+  const { data, error } = await supabaseClient
+    .from("recursos")
+    .select("*")
+    .order("nombre");
+
+  if (error) {
+    console.error("Error cargando recursos:", error);
+    return;
+  }
+
+  recursos = {};
+  recursoSel.innerHTML = `<option value="">Selecciona un recurso</option>`;
+  filtroRecurso.innerHTML = `<option value="">Todos los recursos</option>`;
+
+  data.forEach(r => {
+    recursos[r.nombre] = r.unidades_por_stack;
+
+    // SELECT principal
+    const opt = document.createElement("option");
+    opt.value = r.nombre;
+    opt.textContent = r.nombre;
+    recursoSel.appendChild(opt);
+
+    // Filtro
+    const opt2 = opt.cloneNode(true);
+    filtroRecurso.appendChild(opt2);
+  });
+}
+
 
   let misiones = [];      // se cargan desde Supabase
   let completadas = [];   // idem
@@ -270,6 +301,7 @@ const perfilSec = document.getElementById("perfilSec");  // ← ESTA LÍNEA ERA 
 
 
   function inicializarFormMision() {
+    
     // Stacks
     stacksSel.innerHTML = '<option value="">Stacks</option>';
     for (let i = 1; i <= 36; i++) {
@@ -431,13 +463,18 @@ btnLogin.addEventListener("click", async () => {
     return;
   }
 
-  // 🔥 MOSTRAR EL MENÚ DEL USUARIO
-  document.getElementById("userMenuContainer").style.display = "block";
+  // 🔥 MENÚ
+  userMenuContainer.style.display = "block";
 
   loginSec.style.display = "none";
   appSec.style.display = "block";
-});
 
+  // 🔥 CARGAR RECURSOS DESDE SUPABASE
+  await cargarRecursos();
+
+  // 🔥 INICIALIZAR EL FORMULARIO
+  inicializarFormMision();
+});
 
   // ==========================
   // CREAR MISIÓN (SUPABASE)
@@ -785,21 +822,23 @@ btnLogin.addEventListener("click", async () => {
     loginSec.style.display = "none";
     registerSec.style.display = "none";
     appSec.style.display = "block";
+
+    await cargarRecursos();
     inicializarFormMision();
+
     actualizarUsuarioLogueadoUI();
     await cargarMisiones();
-    
-    // 🔥 MOSTRAR MENÚ SI HAY USUARIO
+
     userMenuContainer.style.display = "block";
   } else {
     loginSec.style.display = "block";
     registerSec.style.display = "none";
     appSec.style.display = "none";
 
-    // 🔥 OCULTAR MENÚ CUANDO NO HAY USUARIO
     userMenuContainer.style.display = "none";
   }
 })();
+
 
     // ==========================
     // CERRAR SESIÓN
