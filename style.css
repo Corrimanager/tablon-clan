@@ -277,16 +277,7 @@ h2 {
   background: rgba(255,255,255,0.1);
 }
 
-/* =============================
-   LOGIN Y REGISTRO CENTRADOS
-   ============================= */
-#login, #register {
-    width: 90%;
-    max-width: 450px;
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-}
+
 
 #perfilSec {
   display: none !important;
@@ -298,12 +289,6 @@ h2 {
     display: flex;
     justify-content: center;
     margin-top: 40px;
-}
-
-/* Ajuste para que los paneles no se peguen al borde */
-#login, #register {
-    max-width: 450px;
-    width: 100%;
 }
 
 /* Secciones internas del tablón (crear, ver, completadas) */
@@ -332,4 +317,13 @@ nav {
     height: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
+}
+
+/* LOGIN Y REGISTRO CENTRADOS DE VERDAD */
+#login,
+#register {
+    width: 90%;           /* para que en pantallas chicas no se desborde */
+    max-width: 450px;     /* ancho máximo del panel */
+    margin: 40px auto;    /* CENTRA horizontalmente */
+    display: block;       /* que se comporte como bloque normal */
 }
