@@ -324,3 +324,7 @@ nav {
     display: flex;
     justify-content: center;
 }
+
+#usuarioLogueado {
+    display: none !important;
+}
