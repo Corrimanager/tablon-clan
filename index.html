@@ -48,8 +48,7 @@
 <button id="btn-completadas">✅ Completadas</button>
 </nav>
 
-<button onclick="cerrarSesion()">Cerrar sesión</button>
-
+<div class="section-wrapper">
 <!-- CREAR -->
 <section id="crear" class="active tab-section">
 <form id="formMision">
@@ -64,7 +63,9 @@
 <button type="submit" class="submit">📜 Agregar misión</button>
 </form>
 </section>
+</div>
 
+<div class="section-wrapper">
 <!-- VER -->
 <section id="ver" class="tab-section">
 <h2>Misiones Activas</h2>
@@ -74,7 +75,9 @@
 </div>
 <div id="listaMisiones"></div>
 </section>
+</div>
 
+<div class="section-wrapper">
 <!-- COMPLETADAS -->
 <section id="completadas" class="tab-section">
 <h2>Misiones Completadas</h2>
@@ -84,7 +87,9 @@
 </div>
 <div id="listaCompletadas"></div>
 </section>
+</div>
 
+<div class="section-wrapper">
 <section id="perfilSec" style="display:none; padding:20px;">
   <h2 style="color:white;">Perfil del Jugador</h2>
 
@@ -110,7 +115,7 @@
 
   <button id="volverApp">Volver al tablón</button>
 </section>
-
+</div>
 
 <script>
 
