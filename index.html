@@ -777,45 +777,51 @@ btnLogin.addEventListener("click", async () => {
     cerrarSesion();
   });
 
-  // ==========================
-  // AL CARGAR LA PÁGINA
-  // ==========================
-  (async function init() {
-    if (loggedUser) {
-      loginSec.style.display = "none";
-      registerSec.style.display = "none";
-      appSec.style.display = "block";
-      inicializarFormMision();
-      actualizarUsuarioLogueadoUI();
-      await cargarMisiones();
-    } else {
-      loginSec.style.display = "block";
-      registerSec.style.display = "none";
-      appSec.style.display = "none";
-
-      // 🔥 OCULTAR MENÚ CUANDO NO HAY USUARIO
-      userMenuContainer.style.display = "none";
-    }
-
-  async function cerrarSesion() {
-    try {
-      await supabaseClient.auth.signOut();
-    } catch (e) {
-      console.error(e);
-    }
-
-    // 🔥 OCULTAR MENÚ DEL USUARIO
-    userMenuContainer.style.display = "none";
-
-    loggedUser = null;
-    guardar();
-    misiones = [];
-    completadas = [];
+// ==========================
+// AL CARGAR LA PÁGINA
+// ==========================
+(async function init() {
+  if (loggedUser) {
+    loginSec.style.display = "none";
+    registerSec.style.display = "none";
+    appSec.style.display = "block";
+    inicializarFormMision();
     actualizarUsuarioLogueadoUI();
-    appSec.style.display = "none";
+    await cargarMisiones();
+    
+    // 🔥 MOSTRAR MENÚ SI HAY USUARIO
+    userMenuContainer.style.display = "block";
+  } else {
     loginSec.style.display = "block";
+    registerSec.style.display = "none";
+    appSec.style.display = "none";
+
+    // 🔥 OCULTAR MENÚ CUANDO NO HAY USUARIO
+    userMenuContainer.style.display = "none";
+  }
+})();
+
+// ==========================
+// CERRAR SESIÓN
+// ==========================
+async function cerrarSesion() {
+  try {
+    await supabaseClient.auth.signOut();
+  } catch (e) {
+    console.error(e);
+  }
+
+  // 🔥 OCULTAR MENÚ DEL USUARIO
+  userMenuContainer.style.display = "none";
+
+  loggedUser = null;
+  guardar();
+  misiones = [];
+  completadas = [];
+  actualizarUsuarioLogueadoUI();
+  appSec.style.display = "none";
+  loginSec.style.display = "block";
 }
-  })();
 </script>
 </body>
 </html>
