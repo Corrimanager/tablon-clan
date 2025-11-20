@@ -327,3 +327,7 @@ nav {
     margin: 40px auto;    /* CENTRA horizontalmente */
     display: block;       /* que se comporte como bloque normal */
 }
+
+#userMenuContainer {
+    display: none;
+}

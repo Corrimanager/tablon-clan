@@ -417,46 +417,27 @@ const perfilSec = document.getElementById("perfilSec");  // ← ESTA LÍNEA ERA 
   // ==========================
   // LOGIN CON SUPABASE
   // ==========================
-  btnLogin.addEventListener("click", async () => {
-    const email = loginUser.value.trim();
-    const pass = loginPass.value.trim();
+btnLogin.addEventListener("click", async () => {
+  const user = loginUser.value.trim();
+  const pass = loginPass.value.trim();
 
-    if (!email || !pass) {
-      alert("Por favor completá correo y contraseña.");
-      return;
-    }
-
-    try {
-      const { data, error } = await supabaseClient.auth.signInWithPassword({
-        email,
-        password: pass,
-      });
-
-      if (error) {
-        console.error(error);
-        alert(error.message || "Error al iniciar sesión.");
-        return;
-      }
-
-      const user = data.user;
-      const nombreParaMostrar =
-        (user.user_metadata && user.user_metadata.nombre) || user.email;
-
-      loggedUser = nombreParaMostrar;
-      guardar();
-
-      loginSec.style.display = "none";
-      registerSec.style.display = "none";
-      appSec.style.display = "block";
-
-      inicializarFormMision();
-      actualizarUsuarioLogueadoUI();
-      await cargarMisiones();
-    } catch (err) {
-      console.error(err);
-      alert("Error de conexión con Supabase.");
-    }
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
+    email: user,
+    password: pass
   });
+
+  if (error) {
+    alert("Usuario o contraseña incorrectos");
+    return;
+  }
+
+  // 🔥 MOSTRAR EL MENÚ DEL USUARIO
+  document.getElementById("userMenuContainer").style.display = "block";
+
+  loginSec.style.display = "none";
+  appSec.style.display = "block";
+});
+
 
   // ==========================
   // CREAR MISIÓN (SUPABASE)
@@ -811,7 +792,29 @@ const perfilSec = document.getElementById("perfilSec");  // ← ESTA LÍNEA ERA 
       loginSec.style.display = "block";
       registerSec.style.display = "none";
       appSec.style.display = "none";
+
+      // 🔥 OCULTAR MENÚ CUANDO NO HAY USUARIO
+      userMenuContainer.style.display = "none";
     }
+
+  async function cerrarSesion() {
+    try {
+      await supabaseClient.auth.signOut();
+    } catch (e) {
+      console.error(e);
+    }
+
+    // 🔥 OCULTAR MENÚ DEL USUARIO
+    userMenuContainer.style.display = "none";
+
+    loggedUser = null;
+    guardar();
+    misiones = [];
+    completadas = [];
+    actualizarUsuarioLogueadoUI();
+    appSec.style.display = "none";
+    loginSec.style.display = "block";
+}
   })();
 </script>
 </body>
