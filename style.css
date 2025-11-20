@@ -311,3 +311,16 @@ h2 {
     max-width: 900px;
     margin: 0 auto;
 }
+
+nav {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.section-wrapper {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+}
