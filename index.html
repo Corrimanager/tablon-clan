@@ -51,7 +51,7 @@
 <button onclick="cerrarSesion()">Cerrar sesión</button>
 
 <!-- CREAR -->
-<section id="crear" class="active">
+<section id="crear" class="active tab-section">
 <form id="formMision">
 <input type="text" id="titulo" placeholder="Título automático" readonly>
 <label>Recurso necesario:</label>
@@ -66,7 +66,7 @@
 </section>
 
 <!-- VER -->
-<section id="ver">
+<section id="ver" class="tab-section">
 <h2>Misiones Activas</h2>
 <div class="filtros">
 <select id="filtroRecurso"><option value="">Todos los recursos</option></select>
@@ -76,7 +76,7 @@
 </section>
 
 <!-- COMPLETADAS -->
-<section id="completadas">
+<section id="completadas" class="tab-section">
 <h2>Misiones Completadas</h2>
 <div class="filtros">
 <select id="filtroCreador"></select>
@@ -198,20 +198,6 @@ const perfilSec = document.getElementById("perfilSec");  // ← ESTA LÍNEA ERA 
       menuPerfil.addEventListener("click", () => {
   alert("Estamos trabajando en la construcción del perfil del jugador. ¡Pronto estará disponible! 🛠️");
 });
-
-        menuPerfil.addEventListener("click", () => {
-        console.log("Abriendo perfil...");
-        appSec.style.display = "none";
-        perfilSec.style.display = "block";
-        cargarPerfil();
-      });
-
-            const volverApp = document.getElementById("volverApp");
-
-      volverApp.addEventListener("click", () => {
-        perfilSec.style.display = "none";
-        appSec.style.display = "block";
-      });
 
           async function cargarPerfil() {
       const { data: sessionData } = await supabaseClient.auth.getSession();
