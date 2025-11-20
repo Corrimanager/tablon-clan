@@ -801,27 +801,27 @@ btnLogin.addEventListener("click", async () => {
   }
 })();
 
-// ==========================
-// CERRAR SESIÓN
-// ==========================
-async function cerrarSesion() {
-  try {
-    await supabaseClient.auth.signOut();
-  } catch (e) {
-    console.error(e);
-  }
+    // ==========================
+    // CERRAR SESIÓN
+    // ==========================
+    async function cerrarSesion() {
+      try {
+        await supabaseClient.auth.signOut();
+      } catch (e) {
+        console.error(e);
+      }
 
-  // 🔥 OCULTAR MENÚ DEL USUARIO
-  userMenuContainer.style.display = "none";
+      // 🔥 OCULTAR MENÚ DEL USUARIO
+      userMenuContainer.style.display = "none";
 
-  loggedUser = null;
-  guardar();
-  misiones = [];
-  completadas = [];
-  actualizarUsuarioLogueadoUI();
-  appSec.style.display = "none";
-  loginSec.style.display = "block";
-}
+      loggedUser = null;
+      guardar();
+      misiones = [];
+      completadas = [];
+      actualizarUsuarioLogueadoUI();
+      appSec.style.display = "none";
+      loginSec.style.display = "block";
+    }
 </script>
 </body>
 </html>
