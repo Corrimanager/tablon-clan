@@ -591,38 +591,50 @@ btnLogin.addEventListener("click", async () => {
     }
   }
 
-  async function completarMisionPorId(id) {
-    if (!loggedUser) {
-      alert("Tenés que estar logueado para completar misiones.");
+ async function completarMisionPorId(id) {
+  const idx = misiones.findIndex((m) => m.id === id);
+  if (idx === -1) return;
+
+  const m = misiones[idx];
+
+  // 🛑 SI LA MISIÓN NO TIENE TOMADA_POR, NO DEBERÍA PODER COMPLETARSE
+  if (!m.tomada_por) {
+    alert("La misión no fue tomada aún, no se puede completar.");
+    return;
+  }
+
+  try {
+    const { error } = await supabaseClient
+      .from("misiones")
+      .update({ 
+        completada: true,
+        // 🔥 GUARDAMOS SIEMPRE LA PERSONA QUE LA TOMÓ
+        completada_por: m.tomada_por 
+      })
+      .eq("id", id);
+
+    if (error) {
+      console.error("Error completando misión:", error);
+      alert("No se pudo completar la misión.");
       return;
     }
-    const idx = misiones.findIndex((m) => m.id === id);
-    if (idx === -1) return;
-    const m = misiones[idx];
 
-    try {
-      const { error } = await supabaseClient
-        .from("misiones")
-        .update({ completada: true, completada_por: loggedUser })
-        .eq("id", id);
+    // Actualizamos local
+    m.completada = true;
+    m.completada_por = m.tomada_por;
 
-      if (error) {
-        console.error("Error completando misión:", error);
-        alert("No se pudo completar la misión.");
-        return;
-      }
+    misiones.splice(idx, 1);
+    completadas.unshift(m);
 
-      m.completada = true;
-      m.completada_por = loggedUser;
-      misiones.splice(idx, 1);
-      completadas.unshift(m);
-      renderMisiones();
-      renderCompletadas();
-    } catch (e) {
-      console.error("Error de conexión al completar misión:", e);
-      alert("Error de conexión al completar misión.");
-    }
+    renderMisiones();
+    renderCompletadas();
+
+  } catch (e) {
+    console.error("Error de conexión al completar misión:", e);
+    alert("Error de conexión al completar misión.");
   }
+}
+
 
   async function borrarMision(id) {
     if (!confirm("¿Borrar esta misión?")) return;
