@@ -664,110 +664,114 @@ btnLogin.addEventListener("click", async () => {
       alert("Error de conexión al borrar misión.");
     }
   }
+// ==========================
+// RENDERIZAR MISIONES
+// ==========================
+function renderMisiones() {
+  listaMisiones.innerHTML = "";
+  let visible = [...misiones];
 
-  // ==========================
-  // RENDERIZAR MISIONES
-  // ==========================
-  function renderMisiones() {
-    listaMisiones.innerHTML = "";
-    let visible = [...misiones];
-
-    if (filtroRecurso.value) {
-      visible = visible.filter((m) => m.recurso === filtroRecurso.value);
-    }
-
-    if (visible.length === 0) {
-      listaMisiones.innerHTML = "<p>No hay misiones activas con esos criterios.</p>";
-      return;
-    }
-
-    visible.forEach((m) => {
-      const total = (recursos[m.recurso] || 0) * (m.stacks || 0);
-      const card = document.createElement("div");
-      card.className = "mision" + (m.tomada_por ? " tomada" : "");
-      card.innerHTML = `
-        <h3>${m.titulo}</h3>
-        <p>🏷️ Recurso: ${m.recurso} (${m.stacks} stacks = ${total} unidades)</p>
-        <p>📅 Creada el: ${m.created_at ? new Date(m.created_at).toLocaleDateString() : "-"}</p>
-        <p>👤 Autor: ${m.autor}</p>
-        ${m.tomada_por ? `<p>⚒️ En curso por: <strong>${m.tomada_por}</strong></p>` : ""}
-      `;
-
-      const btns = document.createElement("div");
-      btns.className = "botones-mision";
-
-      if (!m.tomada_por) {
-  // 🪓 Mostrar botón de tomar solo si NO la tomó nadie
-  const takeBtn = document.createElement("button");
-  takeBtn.textContent = "🪓 Tomar";
-  takeBtn.addEventListener("click", () => tomarMision(m.id));
-  btns.appendChild(takeBtn);
-
-} else {
-
-  // 🔒 Ver si el usuario puede completar
-  const puedeCompletar = (loggedUser === m.tomada_por || loggedUser === m.autor);
-
-  if (puedeCompletar) {
-    // ✔ Mostrar botón solo a tomador o creador
-    const compBtn = document.createElement("button");
-    compBtn.textContent = "✅ Completar";
-    compBtn.addEventListener("click", () => completarMisionPorId(m.id));
-    btns.appendChild(compBtn);
+  if (filtroRecurso.value) {
+    visible = visible.filter((m) => m.recurso === filtroRecurso.value);
   }
+
+  if (visible.length === 0) {
+    listaMisiones.innerHTML = "<p>No hay misiones activas con esos criterios.</p>";
+    return;
+  }
+
+  visible.forEach((m) => {
+    const total = (recursos[m.recurso] || 0) * (m.stacks || 0);
+    const card = document.createElement("div");
+    card.className = "mision" + (m.tomada_por ? " tomada" : "");
+    card.innerHTML = `
+      <h3>${m.titulo}</h3>
+      <p>🏷️ Recurso: ${m.recurso} (${m.stacks} stacks = ${total} unidades)</p>
+      <p>📅 Creada el: ${m.created_at ? new Date(m.created_at).toLocaleDateString() : "-"}</p>
+      <p>👤 Autor: ${m.autor}</p>
+      ${m.tomada_por ? `<p>⚒️ En curso por: <strong>${m.tomada_por}</strong></p>` : ""}
+    `;
+
+    const btns = document.createElement("div");
+    btns.className = "botones-mision";
+
+    if (!m.tomada_por) {
+      const takeBtn = document.createElement("button");
+      takeBtn.textContent = "🪓 Tomar";
+      takeBtn.addEventListener("click", () => tomarMision(m.id));
+      btns.appendChild(takeBtn);
+
+    } else {
+      const puedeCompletar = (loggedUser === m.tomada_por || loggedUser === m.autor);
+
+      if (puedeCompletar) {
+        const compBtn = document.createElement("button");
+        compBtn.textContent = "✅ Completar";
+        compBtn.addEventListener("click", () => completarMisionPorId(m.id));
+        btns.appendChild(compBtn);
+      }
+    }
+
+    const delBtn = document.createElement("button");
+    delBtn.textContent = "🗑️ Borrar";
+    delBtn.addEventListener("click", () => borrarMision(m.id));
+    btns.appendChild(delBtn);
+
+    card.appendChild(btns);
+    listaMisiones.appendChild(card);
+  });
 }
 
-  function renderCompletadas() {
-    listaCompletadas.innerHTML = "";
+// ==========================
+// RENDERIZAR COMPLETADAS
+// ==========================
+function renderCompletadas() {
+  listaCompletadas.innerHTML = "";
 
-    const creadores = [...new Set(completadas.map((m) => m.autor))].filter(Boolean);
-    filtroCreador.innerHTML = '<option value="">Todos los creadores</option>';
-    creadores.forEach((c) => {
-      const o = document.createElement("option");
-      o.value = c;
-      o.textContent = c;
-      filtroCreador.appendChild(o);
-    });
+  const creadores = [...new Set(completadas.map((m) => m.autor))].filter(Boolean);
+  filtroCreador.innerHTML = '<option value="">Todos los creadores</option>';
+  creadores.forEach((c) => {
+    const o = document.createElement("option");
+    o.value = c;
+    o.textContent = c;
+    filtroCreador.appendChild(o);
+  });
 
-    const completadores = [...new Set(completadas.map((m) => m.completada_por))].filter(Boolean);
-    filtroCompletador.innerHTML =
-      '<option value="">Todos los completadores</option>';
-    completadores.forEach((c) => {
-      const o = document.createElement("option");
-      o.value = c;
-      o.textContent = c;
-      filtroCompletador.appendChild(o);
-    });
+  const completadores = [...new Set(completadas.map((m) => m.completada_por))].filter(Boolean);
+  filtroCompletador.innerHTML = '<option value="">Todos los completadores</option>';
+  completadores.forEach((c) => {
+    const o = document.createElement("option");
+    o.value = c;
+    o.textContent = c;
+    filtroCompletador.appendChild(o);
+  });
 
-    let visible = [...completadas];
-    if (filtroCreador.value) {
-      visible = visible.filter((m) => m.autor === filtroCreador.value);
-    }
-    if (filtroCompletador.value) {
-      visible = visible.filter(
-        (m) => m.completada_por === filtroCompletador.value
-      );
-    }
-
-    if (visible.length === 0) {
-      listaCompletadas.innerHTML =
-        "<p>No hay misiones completadas con esos criterios.</p>";
-      return;
-    }
-
-    visible.forEach((m) => {
-      const card = document.createElement("div");
-      card.className = "mision tomada";
-      card.innerHTML = `
-        <h3>${m.titulo}</h3>
-        <p>🏷️ ${m.recurso} (${m.stacks} stacks)</p>
-        <p>💰 ${m.oro} oro</p>
-        <p>👤 Creada por: ${m.autor}</p>
-        <p>✅ Completada por: <strong>${m.completada_por || "-"}</strong></p>
-      `;
-      listaCompletadas.appendChild(card);
-    });
+  let visible = [...completadas];
+  if (filtroCreador.value) {
+    visible = visible.filter((m) => m.autor === filtroCreador.value);
   }
+  if (filtroCompletador.value) {
+    visible = visible.filter((m) => m.completada_por === filtroCompletador.value);
+  }
+
+  if (visible.length === 0) {
+    listaCompletadas.innerHTML = "<p>No hay misiones completadas con esos criterios.</p>";
+    return;
+  }
+
+  visible.forEach((m) => {
+    const card = document.createElement("div");
+    card.className = "mision tomada";
+    card.innerHTML = `
+      <h3>${m.titulo}</h3>
+      <p>🏷️ ${m.recurso} (${m.stacks} stacks)</p>
+      <p>💰 ${m.oro} oro</p>
+      <p>👤 Creada por: ${m.autor}</p>
+      <p>✅ Completada por: <strong>${m.completada_por || "-"}</strong></p>
+    `;
+    listaCompletadas.appendChild(card);
+  });
+}
 
   // ==========================
   // FILTROS Y ORDEN
