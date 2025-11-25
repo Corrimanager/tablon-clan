@@ -463,39 +463,27 @@ btnLogin.addEventListener("click", async () => {
     return;
   }
 
-  // ============================
-  // OBTENER NOMBRE DESDE TABLA usuarios
-  // ============================
-  const { data: perfil, error: perfilError } = await supabaseClient
+  // 1️⃣ OBTENER EL NOMBRE REAL DESDE SUPABASE
+  const { data: userData } = await supabaseClient
     .from("usuarios")
-    .select("*")
-    .eq("auth_id", data.user.id)
+    .select("nombre")
+    .eq("email", user)
     .single();
 
-  if (perfilError) {
-    console.error(perfilError);
-    alert("Error al cargar perfil del usuario.");
-    return;
-  }
-
-  // Guardar nombre del usuario en variable + localStorage
-  loggedUser = perfil.nombre;
+  // 2️⃣ GUARDAR USUARIO EN SESIÓN LOCAL
+  loggedUser = userData?.nombre || user;
   guardar();
+  actualizarUsuarioLogueadoUI();
 
-  // Mostrar nombre en el menú
-  userNameText.textContent = loggedUser;
-
-  // Mostrar el menú desplegable
+  // 3️⃣ HABILITAR MENÚ Y TABLÓN
   userMenuContainer.style.display = "block";
-
-  // Mostrar la app
   loginSec.style.display = "none";
   appSec.style.display = "block";
 
+  // 4️⃣ REINICIAR FORMULARIOS
   inicializarFormMision();
-  cargarMisiones();
+  await cargarMisiones();
 });
-
 
   // ==========================
   // CREAR MISIÓN (SUPABASE)
