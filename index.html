@@ -597,20 +597,25 @@ btnLogin.addEventListener("click", async () => {
 
   const m = misiones[idx];
 
-  // 🛑 Si la misión no fue tomada, no debería completarse
+  // 🛑 1️⃣ VERIFICACIÓN DE PERMISOS
+  if (loggedUser !== m.tomada_por && loggedUser !== m.autor) {
+    alert("Solo puede completar la misión quien la tomó o quien la creó.");
+    return;
+  }
+
+  // 🛑 2️⃣ SI NADIE LA TOMÓ, NO SE PUEDE COMPLETAR
   if (!m.tomada_por) {
-    alert("La misión no fue tomada aún, no se puede completar.");
+    alert("La misión aún no fue tomada. No se puede completar.");
     return;
   }
 
   try {
     const { error } = await supabaseClient
       .from("misiones")
-      .update({ 
+      .update({
         completada: true,
-        // 🔥 ACÁ ESTÁ LA MAGIA:
-        // guarda SIEMPRE al que tomó la misión
-        completada_por: m.tomada_por 
+        // 🔥 SIEMPRE guardar al tomador
+        completada_por: m.tomada_por
       })
       .eq("id", id);
 
@@ -620,7 +625,7 @@ btnLogin.addEventListener("click", async () => {
       return;
     }
 
-    // Actualizamos en memoria
+    // 🟢 Actualizar datos en memoria
     m.completada = true;
     m.completada_por = m.tomada_por;
 
@@ -635,8 +640,6 @@ btnLogin.addEventListener("click", async () => {
     alert("Error de conexión al completar misión.");
   }
 }
-
-
 
   async function borrarMision(id) {
     if (!confirm("¿Borrar esta misión?")) return;
