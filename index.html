@@ -234,9 +234,8 @@ const perfilSec = document.getElementById("perfilSec");  // ← ESTA LÍNEA ERA 
     }
   }
 
-      const menuPerfil = document.getElementById("menuPerfil");
-      menuPerfil.addEventListener("click", () => {
-  alert("Estamos trabajando en la construcción del perfil del jugador. ¡Pronto estará disponible! 🛠️");
+menuPerfil.addEventListener("click", () => {
+  window.location.href = "perfil.html";
 });
 
           async function cargarPerfil() {
