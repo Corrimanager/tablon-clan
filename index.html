@@ -597,7 +597,7 @@ btnLogin.addEventListener("click", async () => {
 
   const m = misiones[idx];
 
-  // 🛑 SI LA MISIÓN NO TIENE TOMADA_POR, NO DEBERÍA PODER COMPLETARSE
+  // 🛑 Si la misión no fue tomada, no debería completarse
   if (!m.tomada_por) {
     alert("La misión no fue tomada aún, no se puede completar.");
     return;
@@ -608,7 +608,8 @@ btnLogin.addEventListener("click", async () => {
       .from("misiones")
       .update({ 
         completada: true,
-        // 🔥 GUARDAMOS SIEMPRE LA PERSONA QUE LA TOMÓ
+        // 🔥 ACÁ ESTÁ LA MAGIA:
+        // guarda SIEMPRE al que tomó la misión
         completada_por: m.tomada_por 
       })
       .eq("id", id);
@@ -619,7 +620,7 @@ btnLogin.addEventListener("click", async () => {
       return;
     }
 
-    // Actualizamos local
+    // Actualizamos en memoria
     m.completada = true;
     m.completada_por = m.tomada_por;
 
@@ -634,6 +635,7 @@ btnLogin.addEventListener("click", async () => {
     alert("Error de conexión al completar misión.");
   }
 }
+
 
 
   async function borrarMision(id) {
