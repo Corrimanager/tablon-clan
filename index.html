@@ -471,7 +471,7 @@ btnLogin.addEventListener("click", async () => {
     .single();
 
   // 2️⃣ GUARDAR USUARIO EN SESIÓN LOCAL
-  loggedUser = userData?.nombre || user;
+  loggedUser = userData.nombre
   guardar();
   actualizarUsuarioLogueadoUI();
 
