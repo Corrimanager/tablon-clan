@@ -463,18 +463,39 @@ btnLogin.addEventListener("click", async () => {
     return;
   }
 
-  // 🔥 MENÚ
+  // ============================
+  // OBTENER NOMBRE DESDE TABLA usuarios
+  // ============================
+  const { data: perfil, error: perfilError } = await supabaseClient
+    .from("usuarios")
+    .select("*")
+    .eq("auth_id", data.user.id)
+    .single();
+
+  if (perfilError) {
+    console.error(perfilError);
+    alert("Error al cargar perfil del usuario.");
+    return;
+  }
+
+  // Guardar nombre del usuario en variable + localStorage
+  loggedUser = perfil.nombre;
+  guardar();
+
+  // Mostrar nombre en el menú
+  userNameText.textContent = loggedUser;
+
+  // Mostrar el menú desplegable
   userMenuContainer.style.display = "block";
 
+  // Mostrar la app
   loginSec.style.display = "none";
   appSec.style.display = "block";
 
-  // 🔥 CARGAR RECURSOS DESDE SUPABASE
-  await cargarRecursos();
-
-  // 🔥 INICIALIZAR EL FORMULARIO
   inicializarFormMision();
+  cargarMisiones();
 });
+
 
   // ==========================
   // CREAR MISIÓN (SUPABASE)
