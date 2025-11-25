@@ -6,257 +6,892 @@
 <title>🪵 Tablón del Clan - Pax Dei</title>
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 </head>
-
 <body>
-
-<header>
-    <h1>🪵 Tablón del Clan - Pax Dei</h1>
-
-    <!-- MENÚ DEL USUARIO (OCULTO HASTA LOGIN) -->
-    <div id="userMenuContainer" style="display:none;">
-        <div id="userMenuButton">
-            <span id="userNameText"></span> ▼
-        </div>
-        <div id="userMenuDropdown">
-            <button id="menuPerfil">Perfil</button>
-            <button id="menuHistorial">Historial de misiones</button>
-            <button id="menuLogout">Cerrar sesión</button>
-        </div>
-    </div>
+<header><h1>🪵 Tablón del Clan - Pax Dei</h1>
+<div id="userMenuContainer">
+  <div id="userMenuButton">
+    <span id="userNameText"></span> ▼
+  </div>
+  <div id="userMenuDropdown">
+    <button id="menuPerfil">Perfil</button>
+    <button id="menuHistorial">Historial de misiones</button>
+    <button id="menuLogout">Cerrar sesión</button>
+  </div>
+</div>
 </header>
 
-<!-- ==========================
-       LOGIN
-=========================== -->
+<!-- LOGIN (CENTRADO) -->
+<div class="form-wrapper">
 <section id="login" class="active">
-    <h2>Login</h2>
-    <input type="text" id="loginUser" placeholder="Usuario">
-    <input type="password" id="loginPass" placeholder="Contraseña">
-    <button id="btnLogin">Ingresar</button>
-    <p>No tienes cuenta? <a href="#" id="showRegister">Regístrate</a></p>
+<h2>Login</h2>
+<input type="text" id="loginUser" placeholder="Usuario">
+<input type="password" id="loginPass" placeholder="Contraseña">
+<button id="btnLogin">Ingresar</button>
+<p>No tienes cuenta? <a href="#" id="showRegister">Regístrate</a></p>
 </section>
+</div>
 
-<!-- ==========================
-       REGISTRO
-=========================== -->
+<!-- REGISTER (CENTRADO) -->
+<div class="form-wrapper">
 <section id="register" style="display:none;">
-    <h2>Registro</h2>
-    <input type="text" id="regUser" placeholder="Usuario">
-    <input type="password" id="regPass" placeholder="Contraseña">
-    <input type="email" id="regEmail" placeholder="Correo electrónico">
-    <button id="btnRegister">Registrar</button>
-    <p>Ya tienes cuenta? <a href="#" id="showLogin">Volver al login</a></p>
+  <h2>Registro</h2>
+  <input type="text" id="regUser" placeholder="Usuario">
+  <input type="password" id="regPass" placeholder="Contraseña">
+  <input type="email" id="regEmail" placeholder="Correo electrónico">
+  <button id="btnRegister">Registrar</button>
+  <p>Ya tienes cuenta? <a href="#" id="showLogin">Volver al login</a></p>
 </section>
+</div>
 
-<!-- ==========================
-         APP
-=========================== -->
+<!-- APP -->
 <main id="app" style="display:none;">
-    <div id="usuarioLogueado"></div>
+<div id="usuarioLogueado"></div>
+<nav>
+<button id="btn-crear" class="active">➕ Crear Misión</button>
+<button id="btn-ver">📜 Ver Misiones</button>
+<button id="btn-completadas">✅ Completadas</button>
+</nav>
 
-    <nav>
-        <button id="btn-crear" class="active">➕ Crear Misión</button>
-        <button id="btn-ver">📜 Ver Misiones</button>
-        <button id="btn-completadas">✅ Completadas</button>
-    </nav>
+<div class="section-wrapper">
+<!-- CREAR -->
+<section id="crear" class="active tab-section">
+<form id="formMision">
+<input type="text" id="titulo" placeholder="Título automático" readonly>
+<label>Recurso necesario:</label>
+<div style="display:flex; gap:10px;">
+<select id="stacks" style="flex:1;"><option value="">Stacks</option></select>
+<select id="recurso" style="flex:2;"><option value="">Selecciona un recurso</option></select>
+</div>
+<input type="number" id="oro" placeholder="Recompensa en oro" required>
+<input type="text" id="autor" placeholder="Tu nombre" readonly>
+<button type="submit" class="submit">📜 Agregar misión</button>
+</form>
+</section>
+</div>
 
-    <!-- CREAR MISIÓN -->
-    <div class="section-wrapper">
-        <section id="crear" class="active tab-section">
-            <form id="formMision">
-                <input type="text" id="titulo" placeholder="Título automático" readonly>
+<div class="section-wrapper">
+<!-- VER -->
+<section id="ver" class="tab-section">
+<h2>Misiones Activas</h2>
+<div class="filtros">
+<select id="filtroRecurso"><option value="">Todos los recursos</option></select>
+<button id="ordenarOro">💰 Ordenar por recompensa</button>
+</div>
+<div id="listaMisiones"></div>
+</section>
+</div>
 
-                <label>Recurso necesario:</label>
-                <div style="display:flex; gap:10px;">
-                    <select id="stacks">
-                        <option value="">Stacks</option>
-                    </select>
-                    <select id="recurso">
-                        <option value="">Selecciona un recurso</option>
-                    </select>
-                </div>
+<div class="section-wrapper">
+<!-- COMPLETADAS -->
+<section id="completadas" class="tab-section">
+<h2>Misiones Completadas</h2>
+<div class="filtros">
+<select id="filtroCreador"></select>
+<select id="filtroCompletador"></select>
+</div>
+<div id="listaCompletadas"></div>
+</section>
+</div>
 
-                <input type="number" id="oro" placeholder="Recompensa en oro" required>
-                <input type="text" id="autor" placeholder="Tu nombre" readonly>
+<div class="section-wrapper">
+<section id="perfilSec" style="display:none; padding:20px;">
+  <h2 style="color:white;">Perfil del Jugador</h2>
 
-                <button type="submit" class="submit">📜 Agregar misión</button>
-            </form>
-        </section>
-    </div>
+  <div class="perfil-card" style="
+      background:#2d2d2d;
+      color:white;
+      padding:20px;
+      border-radius:10px;
+      margin-bottom:20px;
+      max-width:400px;
+  ">
+    <p><strong>Nombre:</strong> <span id="perfilNombre"></span></p>
+    <p><strong>Email:</strong> <span id="perfilEmail"></span></p>
+    <p><strong>Rol:</strong> <span id="perfilRol"></span></p>
+    <p><strong>Miembro desde:</strong> <span id="perfilFecha"></span></p>
 
-    <!-- VER MISIÓN -->
-    <div class="section-wrapper">
-        <section id="ver" class="tab-section">
-            <h2>Misiones Activas</h2>
-            <div class="filtros">
-                <select id="filtroRecurso"><option value="">Todos los recursos</option></select>
-                <button id="ordenarOro">💰 Ordenar por recompensa</button>
-            </div>
-            <div id="listaMisiones"></div>
-        </section>
-    </div>
+    <h3>Estadísticas</h3>
+    <p><strong>Misiones creadas:</strong> <span id="perfilCreadas">0</span></p>
+    <p><strong>Misiones completadas:</strong> <span id="perfilCompletadas">0</span></p>
+    <p><strong>Total de stacks recolectados:</strong> <span id="perfilStacks">0</span></p>
+    <p><strong>Oro generado:</strong> <span id="perfilOro">0</span></p>
+  </div>
 
-    <!-- COMPLETADAS -->
-    <div class="section-wrapper">
-        <section id="completadas" class="tab-section">
-            <h2>Misiones Completadas</h2>
-            <div class="filtros">
-                <select id="filtroCreador"></select>
-                <select id="filtroCompletador"></select>
-            </div>
-            <div id="listaCompletadas"></div>
-        </section>
-    </div>
-</main>
+  <button id="volverApp">Volver al tablón</button>
+</section>
+</div>
 
-<!-- ==========================
-        SCRIPT
-=========================== -->
 <script>
-/* ---------- CONFIG SUPABASE ---------- */
-const SUPABASE_URL = "https://ipwxzkdpgbwgdeflzaks.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlwd3h6a2RwZ2J3Z2RlZmx6YWtzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI4MTQ4NDksImV4cCI6MjA3ODM5MDg0OX0.LwtXhr_AY-6f09thVqaUSiop2YvqEEc4X5Vg1-jZQvQ";
 
-const { createClient } = supabase;
-const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  let ordenarPorOro = false;
 
-/* ---------- VARIABLES ---------- */
-let misiones = [];
-let completadas = [];
-let loggedUser = localStorage.getItem("loggedUser") || null;
+  // ==========================
+  // CONFIGURACIÓN SUPABASE
+  // ==========================
+  const SUPABASE_URL = "https://ipwxzkdpgbwgdeflzaks.supabase.co";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Imlwd3h6a2RwZ2J3Z2RlZmx6YWtzIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NjI4MTQ4NDksImV4cCI6MjA3ODM5MDg0OX0.LwtXhr_AY-6f09thVqaUSiop2YvqEEc4X5Vg1-jZQvQ";
 
-/* ---------- ELEMENTOS DOM ---------- */
+  const { createClient } = supabase;
+  const supabaseClient = createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+  // ==========================
+  // DATOS EN MEMORIA DESDE SUPABASE (BASE DE DATOS - RECURSOS)
+  // ==========================
+ let recursos = {};
+
+async function cargarRecursos() {
+  const { data, error } = await supabaseClient
+    .from("recursos")
+    .select("*")
+    .order("nombre");
+
+  if (error) {
+    console.error("Error cargando recursos:", error);
+    return;
+  }
+
+  recursos = {};
+  recursoSel.innerHTML = `<option value="">Selecciona un recurso</option>`;
+  filtroRecurso.innerHTML = `<option value="">Todos los recursos</option>`;
+
+  data.forEach(r => {
+    recursos[r.nombre] = r.unidades_por_stack;
+
+    // SELECT principal
+    const opt = document.createElement("option");
+    opt.value = r.nombre;
+    opt.textContent = r.nombre;
+    recursoSel.appendChild(opt);
+
+    // Filtro
+    const opt2 = opt.cloneNode(true);
+    filtroRecurso.appendChild(opt2);
+  });
+}
+
+
+  let misiones = [];      // se cargan desde Supabase
+  let completadas = [];   // idem
+  let loggedUser = localStorage.getItem("loggedUser") || null; // nombre visible
+
+  // ==========================
+  // REFERENCIAS AL DOM
+  // ==========================
 const loginSec = document.getElementById("login");
 const registerSec = document.getElementById("register");
 const appSec = document.getElementById("app");
 
 const loginUser = document.getElementById("loginUser");
 const loginPass = document.getElementById("loginPass");
-
 const regUser = document.getElementById("regUser");
 const regPass = document.getElementById("regPass");
 const regEmail = document.getElementById("regEmail");
-
 const btnLogin = document.getElementById("btnLogin");
 const btnRegister = document.getElementById("btnRegister");
-
 const showRegister = document.getElementById("showRegister");
 const showLogin = document.getElementById("showLogin");
+const usuarioLogueado = document.getElementById("usuarioLogueado");
+
+const form = document.getElementById("formMision");
+const titulo = document.getElementById("titulo");
+const stacksSel = document.getElementById("stacks");
+const recursoSel = document.getElementById("recurso");
+const oroInput = document.getElementById("oro");
+const autorInput = document.getElementById("autor");
+const filtroRecurso = document.getElementById("filtroRecurso");
+const ordenarBtn = document.getElementById("ordenarOro");
+const listaMisiones = document.getElementById("listaMisiones");
+const listaCompletadas = document.getElementById("listaCompletadas");
+const filtroCreador = document.getElementById("filtroCreador");
+const filtroCompletador = document.getElementById("filtroCompletador");
 
 const userMenuContainer = document.getElementById("userMenuContainer");
 const userMenuButton = document.getElementById("userMenuButton");
 const userMenuDropdown = document.getElementById("userMenuDropdown");
 const userNameText = document.getElementById("userNameText");
 
-/* =====================================================
-                 LOGIN / REGISTRO
-===================================================== */
-btnLogin.addEventListener("click", async () => {
-    const user = loginUser.value.trim();
-    const pass = loginPass.value.trim();
+const perfilSec = document.getElementById("perfilSec");  // ← ESTA LÍNEA ERA LA QUE FALTABA
 
-    const { data, error } = await supabaseClient.auth.signInWithPassword({
-        email: user,
-        password: pass
-    });
-
-    if (error) {
-        alert("Usuario o contraseña incorrectos");
-        return;
+  // ==========================
+  // UTILIDADES GENERALES
+  // ==========================
+  function guardar() {
+    // Solo guardamos el nombre del usuario localmente
+    if (loggedUser) {
+      localStorage.setItem("loggedUser", loggedUser);
+    } else {
+      localStorage.removeItem("loggedUser");
     }
+  }
 
-    loggedUser = user;
-    localStorage.setItem("loggedUser", loggedUser);
+  function actualizarUsuarioLogueadoUI() {
+    if (loggedUser) {
+      usuarioLogueado.textContent = `Usuario: ${loggedUser}`;
+      userNameText.textContent = loggedUser;
+    } else {
+      usuarioLogueado.textContent = "";
+      userNameText.textContent = "";
+    }
+  }
 
-    userNameText.textContent = loggedUser;
-    userMenuContainer.style.display = "block";
-
-    loginSec.style.display = "none";
-    appSec.style.display = "block";
+      const menuPerfil = document.getElementById("menuPerfil");
+      menuPerfil.addEventListener("click", () => {
+  alert("Estamos trabajando en la construcción del perfil del jugador. ¡Pronto estará disponible! 🛠️");
 });
 
-/* ---------- REGISTRO ---------- */
-showRegister.addEventListener("click", e => {
+          async function cargarPerfil() {
+      const { data: sessionData } = await supabaseClient.auth.getSession();
+      const user = sessionData.session.user;
+
+      const { data: perfil, error } = await supabaseClient
+        .from("usuarios")
+        .select("*")
+        .eq("auth_id", user.id)
+        .single();
+
+      if (error) {
+        console.error(error);
+        return;
+      }
+
+      document.getElementById("perfilNombre").textContent = perfil.nombre;
+      document.getElementById("perfilEmail").textContent = perfil.email;
+      document.getElementById("perfilRol").textContent = perfil.rol;
+      document.getElementById("perfilFecha").textContent = new Date(perfil.creado_el).toLocaleDateString();
+
+      cargarEstadisticas(perfil.nombre);
+    }
+
+
+    async function cargarEstadisticas(nombre) {
+      // Misiones creadas
+      const { count: creadas } = await supabaseClient
+        .from("misiones")
+        .select("*", { count: "exact" })
+        .eq("autor", nombre);
+
+      // Misiones completadas
+      const { count: completadas } = await supabaseClient
+        .from("misiones")
+        .select("*", { count: "exact" })
+        .eq("completada_por", nombre);
+
+      // Oro total generado
+      const { data: misionesCompletadas } = await supabaseClient
+        .from("misiones")
+        .select("oro, stacks, recurso")
+        .eq("completada_por", nombre);
+
+      let totalOro = 0;
+      let totalStacks = 0;
+
+      if (misionesCompletadas) {
+        misionesCompletadas.forEach(m => {
+          totalOro += m.oro;
+          totalStacks += m.stacks;
+        });
+      }
+
+      // Mostrar en pantalla
+      document.getElementById("perfilCreadas").textContent = creadas;
+      document.getElementById("perfilCompletadas").textContent = completadas;
+      document.getElementById("perfilOro").textContent = totalOro;
+      document.getElementById("perfilStacks").textContent = totalStacks;
+    }
+
+
+  function inicializarFormMision() {
+    
+    // Stacks
+    stacksSel.innerHTML = '<option value="">Stacks</option>';
+    for (let i = 1; i <= 36; i++) {
+      const o = document.createElement("option");
+      o.value = i;
+      o.textContent = i;
+      stacksSel.appendChild(o);
+    }
+
+    // Recursos
+    recursoSel.innerHTML = '<option value="">Selecciona un recurso</option>';
+    Object.keys(recursos).forEach((r) => {
+      const o = document.createElement("option");
+      o.value = r;
+      o.textContent = r;
+      recursoSel.appendChild(o);
+
+      // también al filtro
+      if (!Array.from(filtroRecurso.options).some((opt) => opt.value === r)) {
+        filtroRecurso.appendChild(o.cloneNode(true));
+      }
+    });
+
+    autorInput.value = loggedUser || "";
+  }
+
+  function actualizarTitulo() {
+    if (stacksSel.value && recursoSel.value) {
+      titulo.value = `Recolectar ${stacksSel.value} stacks de ${recursoSel.value}`;
+    } else {
+      titulo.value = "";
+    }
+  }
+
+  stacksSel.addEventListener("change", actualizarTitulo);
+  recursoSel.addEventListener("change", actualizarTitulo);
+
+  // ==========================
+  // CARGAR MISIONES DESDE SUPABASE
+  // ==========================
+  async function cargarMisiones() {
+    try {
+      const { data, error } = await supabaseClient
+        .from("misiones")
+        .select("*")
+        .order("created_at", { ascending: true });
+
+      if (error) {
+        console.error("Error cargando misiones:", error);
+        alert("No se pudieron cargar las misiones desde el servidor.");
+        return;
+      }
+
+      misiones = data.filter((m) => !m.completada);
+      completadas = data.filter((m) => m.completada);
+
+      renderMisiones();
+      renderCompletadas();
+    } catch (e) {
+      console.error("Error de conexión al cargar misiones:", e);
+      alert("Error de conexión al cargar misiones.");
+    }
+  }
+
+  // ==========================
+  // CAMBIO ENTRE LOGIN / REGISTRO
+  // ==========================
+  showRegister.addEventListener("click", (e) => {
     e.preventDefault();
     loginSec.style.display = "none";
     registerSec.style.display = "block";
-});
+  });
 
-showLogin.addEventListener("click", e => {
+  showLogin.addEventListener("click", (e) => {
     e.preventDefault();
     registerSec.style.display = "none";
     loginSec.style.display = "block";
-});
+  });
 
-/* ---------- CERRAR SESIÓN ---------- */
-document.getElementById("menuLogout").addEventListener("click", async () => {
-    await supabaseClient.auth.signOut();
+  // ==========================
+  // REGISTRO CON SUPABASE
+  // ==========================
+  btnRegister.addEventListener("click", async () => {
+    console.log("🔵 EVENTO DE REGISTRO EJECUTADO");
+  const nombre = regUser.value.trim();
+  const email = regEmail.value.trim();
+  const pass = regPass.value.trim();
 
-    loggedUser = null;
-    localStorage.removeItem("loggedUser");
+  if (!nombre || !email || !pass) {
+    alert("Por favor completá todos los campos.");
+    return;
+  }
 
-    userMenuContainer.style.display = "none";
-    appSec.style.display = "none";
+  try {
+    // 1. REGISTRO EN SUPABASE AUTH
+    const { data, error } = await supabaseClient.auth.signUp({
+      email: email,
+      password: pass,
+      options: {
+        data: { nombre } // esto queda como metadata en Auth
+      },
+    });
+
+    if (error) {
+      console.error(error);
+      alert(error.message || "Error al registrar usuario.");
+      return;
+    }
+
+    // 2. GUARDAR USUARIO EN LA TABLA "usuarios"
+    if (data && data.user) {
+      console.log("🟢 DATA.USER EXISTE, INSERTARÉ EN LA BASE: ", data.user.id);
+      const { error: insertError } = await supabaseClient
+        .from("usuarios")
+        .insert([
+          {
+            auth_id: data.user.id,
+            nombre: nombre,
+            email: email,
+            rol: "jugador" // rol por defecto
+          }
+        ]);
+
+      if (insertError) {
+        console.error("🔴 Error insertando usuario:", insertError);
+        console.error("Error insertando usuario en tabla usuarios:", insertError);
+        alert("Error guardando datos en la base de usuarios.");
+        return;
+      }
+    }
+
+    alert("Usuario registrado. Ahora podés iniciar sesión.");
+    regUser.value = "";
+    regEmail.value = "";
+    regPass.value = "";
+    registerSec.style.display = "none";
     loginSec.style.display = "block";
+
+  } catch (err) {
+    console.error(err);
+    alert("Error de conexión con Supabase.");
+  }
 });
 
-/* =====================================================
-           OCULTAR MENÚ AL HACER CLICK AFUERA
-===================================================== */
-userMenuButton.addEventListener("click", () => {
-    userMenuDropdown.style.display =
-        userMenuDropdown.style.display === "block" ? "none" : "block";
+  // ==========================
+  // LOGIN CON SUPABASE
+  // ==========================
+btnLogin.addEventListener("click", async () => {
+  const user = loginUser.value.trim();
+  const pass = loginPass.value.trim();
+
+  const { data, error } = await supabaseClient.auth.signInWithPassword({
+    email: user,
+    password: pass
+  });
+
+  if (error) {
+    alert("Usuario o contraseña incorrectos");
+    return;
+  }
+
+  // 1️⃣ OBTENER EL NOMBRE REAL DESDE SUPABASE
+  const { data: userData } = await supabaseClient
+    .from("usuarios")
+    .select("nombre")
+    .eq("email", user)
+    .single();
+
+  // 2️⃣ GUARDAR USUARIO EN SESIÓN LOCAL
+  loggedUser = userData?.nombre || user;
+  guardar();
+  actualizarUsuarioLogueadoUI();
+
+  // 3️⃣ HABILITAR MENÚ Y TABLÓN
+  userMenuContainer.style.display = "block";
+  loginSec.style.display = "none";
+  appSec.style.display = "block";
+
+  // 4️⃣ REINICIAR FORMULARIOS
+  inicializarFormMision();
+  await cargarMisiones();
 });
 
-document.addEventListener("click", (e) => {
-    if (!userMenuContainer.contains(e.target)) {
-        userMenuDropdown.style.display = "none";
+  // ==========================
+  // CREAR MISIÓN (SUPABASE)
+  // ==========================
+  form.addEventListener("submit", async (e) => {
+    e.preventDefault();
+    if (!titulo.value || !stacksSel.value || !recursoSel.value) {
+      alert("Seleccioná stacks, recurso y completá el oro.");
+      return;
     }
-});
-
-/* =====================================================
-         INICIALIZAR STICKS Y RECURSOS
-===================================================== */
-async function inicializarFormMision() {
-    const stacksSel = document.getElementById("stacks");
-    const recursoSel = document.getElementById("recurso");
-    const filtroRecurso = document.getElementById("filtroRecurso");
-
-    stacksSel.innerHTML = `<option value="">Stacks</option>`;
-    for (let i = 1; i <= 36; i++) {
-        stacksSel.innerHTML += `<option value="${i}">${i}</option>`;
+    if (!loggedUser) {
+      alert("Tenés que estar logueado para crear misiones.");
+      return;
     }
 
-    recursoSel.innerHTML = `<option value="">Selecciona un recurso</option>`;
-    filtroRecurso.innerHTML = `<option value="">Todos los recursos</option>`;
+    const nuevaMision = {
+      titulo: titulo.value,
+      recurso: recursoSel.value,
+      stacks: parseInt(stacksSel.value),
+      oro: parseInt(oroInput.value) || 0,
+      autor: loggedUser,
+      tomada_por: null,
+      completada: false,
+      completada_por: null,
+    };
 
-    const { data, error } = await supabaseClient
-        .from("recursos")
-        .select("*")
-        .order("nombre");
+    try {
+      const { data, error } = await supabaseClient
+        .from("misiones")
+        .insert([nuevaMision])
+        .select()
+        .single();
 
-    if (!error && data) {
-        data.forEach(r => {
-            recursoSel.innerHTML += `<option value="${r.nombre}">${r.nombre}</option>`;
-            filtroRecurso.innerHTML += `<option value="${r.nombre}">${r.nombre}</option>`;
-        });
+      if (error) {
+        console.error("Error creando misión:", error);
+        alert("No se pudo crear la misión.");
+        return;
+      }
+
+      // data trae la misión con id uuid y created_at
+      misiones.unshift(data);
+      form.reset();
+      titulo.value = "";
+      inicializarFormMision();
+      renderMisiones();
+    } catch (err) {
+      console.error("Error de conexión al crear misión:", err);
+      alert("Error de conexión al crear misión.");
     }
+  });
+
+  // ==========================
+  // NAVEGACIÓN ENTRE SECCIONES
+  // ==========================
+  const secciones = {
+    crear: document.getElementById("crear"),
+    ver: document.getElementById("ver"),
+    completadas: document.getElementById("completadas"),
+  };
+  const botones = {
+    crear: document.getElementById("btn-crear"),
+    ver: document.getElementById("btn-ver"),
+    completadas: document.getElementById("btn-completadas"),
+  };
+
+  Object.keys(botones).forEach((k) => {
+    botones[k].addEventListener("click", () => {
+      Object.values(secciones).forEach((s) => s.classList.remove("active"));
+      Object.values(botones).forEach((b) => b.classList.remove("active"));
+      secciones[k].classList.add("active");
+      botones[k].classList.add("active");
+      if (k === "ver") renderMisiones();
+      if (k === "completadas") renderCompletadas();
+    });
+  });
+
+  // ==========================
+  // ACCIONES SOBRE MISIONES
+  // ==========================
+  async function tomarMision(id) {
+    if (!loggedUser) {
+      alert("Tenés que estar logueado para tomar misiones.");
+      return;
+    }
+    const idx = misiones.findIndex((m) => m.id === id);
+    if (idx === -1) return;
+
+    try {
+      const { error } = await supabaseClient
+        .from("misiones")
+        .update({ tomada_por: loggedUser })
+        .eq("id", id);
+
+      if (error) {
+        console.error("Error tomando misión:", error);
+        alert("No se pudo tomar la misión.");
+        return;
+      }
+
+      misiones[idx].tomada_por = loggedUser;
+      renderMisiones();
+    } catch (e) {
+      console.error("Error de conexión al tomar misión:", e);
+      alert("Error de conexión al tomar misión.");
+    }
+  }
+
+ async function completarMisionPorId(id) {
+  const idx = misiones.findIndex((m) => m.id === id);
+  if (idx === -1) return;
+
+  const m = misiones[idx];
+
+  // 🛑 1️⃣ VERIFICACIÓN DE PERMISOS
+  if (loggedUser !== m.tomada_por && loggedUser !== m.autor) {
+    alert("Solo puede completar la misión quien la tomó o quien la creó.");
+    return;
+  }
+
+  // 🛑 2️⃣ SI NADIE LA TOMÓ, NO SE PUEDE COMPLETAR
+  if (!m.tomada_por) {
+    alert("La misión aún no fue tomada. No se puede completar.");
+    return;
+  }
+
+  try {
+    const { error } = await supabaseClient
+      .from("misiones")
+      .update({
+        completada: true,
+        // 🔥 SIEMPRE guardar al tomador
+        completada_por: m.tomada_por
+      })
+      .eq("id", id);
+
+    if (error) {
+      console.error("Error completando misión:", error);
+      alert("No se pudo completar la misión.");
+      return;
+    }
+
+    // 🟢 Actualizar datos en memoria
+    m.completada = true;
+    m.completada_por = m.tomada_por;
+
+    misiones.splice(idx, 1);
+    completadas.unshift(m);
+
+    renderMisiones();
+    renderCompletadas();
+
+  } catch (e) {
+    console.error("Error de conexión al completar misión:", e);
+    alert("Error de conexión al completar misión.");
+  }
 }
 
-/* =====================================================
-             INIT
-===================================================== */
-(async function init() {
-    if (loggedUser) {
-        loginSec.style.display = "none";
-        appSec.style.display = "block";
-        userMenuContainer.style.display = "block";
-        userNameText.textContent = loggedUser;
+  async function borrarMision(id) {
+    if (!confirm("¿Borrar esta misión?")) return;
+
+    try {
+      const { error } = await supabaseClient
+        .from("misiones")
+        .delete()
+        .eq("id", id);
+
+      if (error) {
+        console.error("Error borrando misión:", error);
+        alert("No se pudo borrar la misión.");
+        return;
+      }
+
+      misiones = misiones.filter((x) => x.id !== id);
+      completadas = completadas.filter((x) => x.id !== id);
+      renderMisiones();
+      renderCompletadas();
+    } catch (e) {
+      console.error("Error de conexión al borrar misión:", e);
+      alert("Error de conexión al borrar misión.");
+    }
+  }
+
+  // ==========================
+  // RENDERIZAR MISIONES
+  // ==========================
+  function renderMisiones() {
+    listaMisiones.innerHTML = "";
+    let visible = [...misiones];
+
+    if (filtroRecurso.value) {
+      visible = visible.filter((m) => m.recurso === filtroRecurso.value);
     }
 
-    inicializarFormMision();
-})();
-</script>
+    if (visible.length === 0) {
+      listaMisiones.innerHTML = "<p>No hay misiones activas con esos criterios.</p>";
+      return;
+    }
 
+    visible.forEach((m) => {
+      const total = (recursos[m.recurso] || 0) * (m.stacks || 0);
+      const card = document.createElement("div");
+      card.className = "mision" + (m.tomada_por ? " tomada" : "");
+      card.innerHTML = `
+        <h3>${m.titulo}</h3>
+        <p>🏷️ Recurso: ${m.recurso} (${m.stacks} stacks = ${total} unidades)</p>
+        <p>📅 Creada el: ${m.created_at ? new Date(m.created_at).toLocaleDateString() : "-"}</p>
+        <p>👤 Autor: ${m.autor}</p>
+        ${m.tomada_por ? `<p>⚒️ En curso por: <strong>${m.tomada_por}</strong></p>` : ""}
+      `;
+
+      const btns = document.createElement("div");
+      btns.className = "botones-mision";
+
+      if (!m.tomada_por) {
+  // 🪓 Mostrar botón de tomar solo si NO la tomó nadie
+  const takeBtn = document.createElement("button");
+  takeBtn.textContent = "🪓 Tomar";
+  takeBtn.addEventListener("click", () => tomarMision(m.id));
+  btns.appendChild(takeBtn);
+
+} else {
+
+  // 🔒 Ver si el usuario puede completar
+  const puedeCompletar = (loggedUser === m.tomada_por || loggedUser === m.autor);
+
+  if (puedeCompletar) {
+    // ✔ Mostrar botón solo a tomador o creador
+    const compBtn = document.createElement("button");
+    compBtn.textContent = "✅ Completar";
+    compBtn.addEventListener("click", () => completarMisionPorId(m.id));
+    btns.appendChild(compBtn);
+  }
+}
+
+
+  function renderCompletadas() {
+    listaCompletadas.innerHTML = "";
+
+    const creadores = [...new Set(completadas.map((m) => m.autor))].filter(Boolean);
+    filtroCreador.innerHTML = '<option value="">Todos los creadores</option>';
+    creadores.forEach((c) => {
+      const o = document.createElement("option");
+      o.value = c;
+      o.textContent = c;
+      filtroCreador.appendChild(o);
+    });
+
+    const completadores = [...new Set(completadas.map((m) => m.completada_por))].filter(Boolean);
+    filtroCompletador.innerHTML =
+      '<option value="">Todos los completadores</option>';
+    completadores.forEach((c) => {
+      const o = document.createElement("option");
+      o.value = c;
+      o.textContent = c;
+      filtroCompletador.appendChild(o);
+    });
+
+    let visible = [...completadas];
+    if (filtroCreador.value) {
+      visible = visible.filter((m) => m.autor === filtroCreador.value);
+    }
+    if (filtroCompletador.value) {
+      visible = visible.filter(
+        (m) => m.completada_por === filtroCompletador.value
+      );
+    }
+
+    if (visible.length === 0) {
+      listaCompletadas.innerHTML =
+        "<p>No hay misiones completadas con esos criterios.</p>";
+      return;
+    }
+
+    visible.forEach((m) => {
+      const card = document.createElement("div");
+      card.className = "mision tomada";
+      card.innerHTML = `
+        <h3>${m.titulo}</h3>
+        <p>🏷️ ${m.recurso} (${m.stacks} stacks)</p>
+        <p>💰 ${m.oro} oro</p>
+        <p>👤 Creada por: ${m.autor}</p>
+        <p>✅ Completada por: <strong>${m.completada_por || "-"}</strong></p>
+      `;
+      listaCompletadas.appendChild(card);
+    });
+  }
+
+  // ==========================
+  // FILTROS Y ORDEN
+  // ==========================
+  filtroRecurso.addEventListener("change", renderMisiones);
+  ordenarBtn.addEventListener("click", () => {
+    ordenarPorOro = !ordenarPorOro;
+    ordenarBtn.textContent = ordenarPorOro
+      ? "🔽 Mostrar todas"
+      : "💰 Ordenar por recompensa";
+    renderMisiones();
+  });
+  filtroCreador.addEventListener("change", renderCompletadas);
+  filtroCompletador.addEventListener("change", renderCompletadas);
+
+  // ==========================
+  // CERRAR SESIÓN
+  // ==========================
+  async function cerrarSesion() {
+    try {
+      await supabaseClient.auth.signOut();
+    } catch (e) {
+      console.error(e);
+    }
+    loggedUser = null;
+    guardar();
+    misiones = [];
+    completadas = [];
+    actualizarUsuarioLogueadoUI();
+    appSec.style.display = "none";
+    loginSec.style.display = "block";
+  }
+
+  window.cerrarSesion = cerrarSesion;
+
+  // ==========================
+  // RESET TEMPORAL (DEBUG)
+  // ==========================
+  window.resetearDatos = function () {
+    loggedUser = null;
+    guardar();
+    misiones = [];
+    completadas = [];
+    alert(
+      "Se reseteó el usuario local. Las misiones en Supabase siguen intactas. Recargá la página."
+    );
+  };
+
+  // ==========================
+  // MENÚ DESPLEGABLE DEL USUARIO
+  // ==========================
+  if (loggedUser) {
+    userNameText.textContent = loggedUser;
+  }
+
+  userMenuButton.addEventListener("click", () => {
+    userMenuDropdown.style.display =
+      userMenuDropdown.style.display === "block" ? "none" : "block";
+  });
+
+  document.addEventListener("click", (e) => {
+    if (!userMenuContainer.contains(e.target)) {
+      userMenuDropdown.style.display = "none";
+    }
+  });
+
+  document.getElementById("menuLogout").addEventListener("click", () => {
+    cerrarSesion();
+  });
+
+// ==========================
+// AL CARGAR LA PÁGINA
+// ==========================
+(async function init() {
+  if (loggedUser) {
+    loginSec.style.display = "none";
+    registerSec.style.display = "none";
+    appSec.style.display = "block";
+
+    await cargarRecursos();
+    inicializarFormMision();
+
+    actualizarUsuarioLogueadoUI();
+    await cargarMisiones();
+
+    userMenuContainer.style.display = "block";
+  } else {
+    loginSec.style.display = "block";
+    registerSec.style.display = "none";
+    appSec.style.display = "none";
+
+    userMenuContainer.style.display = "none";
+  }
+})();
+
+
+    // ==========================
+    // CERRAR SESIÓN
+    // ==========================
+    async function cerrarSesion() {
+      try {
+        await supabaseClient.auth.signOut();
+      } catch (e) {
+        console.error(e);
+      }
+
+      // 🔥 OCULTAR MENÚ DEL USUARIO
+      userMenuContainer.style.display = "none";
+
+      loggedUser = null;
+      guardar();
+      misiones = [];
+      completadas = [];
+      actualizarUsuarioLogueadoUI();
+      appSec.style.display = "none";
+      loginSec.style.display = "block";
+    }
+</script>
 </body>
 </html>
+
+
+
+
+
