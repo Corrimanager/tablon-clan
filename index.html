@@ -698,26 +698,26 @@ btnLogin.addEventListener("click", async () => {
       btns.className = "botones-mision";
 
       if (!m.tomada_por) {
-  // 🪓 Mostrar botón de tomar solo si NO la tomó nadie
-  const takeBtn = document.createElement("button");
-  takeBtn.textContent = "🪓 Tomar";
-  takeBtn.addEventListener("click", () => tomarMision(m.id));
-  btns.appendChild(takeBtn);
+        const takeBtn = document.createElement("button");
+        takeBtn.textContent = "🪓 Tomar";
+        takeBtn.addEventListener("click", () => tomarMision(m.id));
+        btns.appendChild(takeBtn);
+      } else {
+        const compBtn = document.createElement("button");
+        compBtn.textContent = "✅ Completar";
+        compBtn.addEventListener("click", () => completarMisionPorId(m.id));
+        btns.appendChild(compBtn);
+      }
 
-} else {
+      const delBtn = document.createElement("button");
+      delBtn.textContent = "🗑️ Borrar";
+      delBtn.addEventListener("click", () => borrarMision(m.id));
+      btns.appendChild(delBtn);
 
-  // 🔒 Ver si el usuario puede completar
-  const puedeCompletar = (loggedUser === m.tomada_por || loggedUser === m.autor);
-
-  if (puedeCompletar) {
-    // ✔ Mostrar botón solo a tomador o creador
-    const compBtn = document.createElement("button");
-    compBtn.textContent = "✅ Completar";
-    compBtn.addEventListener("click", () => completarMisionPorId(m.id));
-    btns.appendChild(compBtn);
+      card.appendChild(btns);
+      listaMisiones.appendChild(card);
+    });
   }
-}
-
 
   function renderCompletadas() {
     listaCompletadas.innerHTML = "";
