@@ -59,14 +59,14 @@
 <input type="text" id="titulo" placeholder="Título automático" readonly>
 <label>Recurso necesario:</label>
 <div style="display:flex; gap:10px;">
-<select id="stacks" style="flex:1;"><option value="">Stacks</option></select>
-<select id="recurso" style="flex:2;"><option value="">Selecciona un recurso</option></select>
-</div>
-<input type="number" id="oro" placeholder="Recompensa en oro" required>
-<input type="text" id="autor" placeholder="Tu nombre" readonly>
-<button type="submit" class="submit">📜 Agregar misión</button>
-</form>
-</section>
+  <input
+    type="number"
+    id="stacks"
+    style="flex:1;"
+    min="1"
+    placeholder="Stacks"
+  />
+  <select id="recurso" style="flex:2;"><option value="">Selecciona un recurso</option></select>
 </div>
 
 <div class="section-wrapper">
@@ -301,40 +301,49 @@ const perfilSec = document.getElementById("perfilSec");  // ← ESTA LÍNEA ERA 
 
 
   function inicializarFormMision() {
-    
-    // Stacks
-    stacksSel.innerHTML = '<option value="">Stacks</option>';
-    for (let i = 1; i <= 36; i++) {
-      const o = document.createElement("option");
-      o.value = i;
-      o.textContent = i;
-      stacksSel.appendChild(o);
+  // Limpiar stacks
+  stacksSel.value = "";
+
+  // Recursos
+  recursoSel.innerHTML = '<option value="">Selecciona un recurso</option>';
+  Object.keys(recursos).forEach((r) => {
+    const o = document.createElement("option");
+    o.value = r;
+    o.textContent = r;
+    recursoSel.appendChild(o);
+
+    // también al filtro
+    if (!Array.from(filtroRecurso.options).some((opt) => opt.value === r)) {
+      filtroRecurso.appendChild(o.cloneNode(true));
     }
+  });
 
-    // Recursos
-    recursoSel.innerHTML = '<option value="">Selecciona un recurso</option>';
-    Object.keys(recursos).forEach((r) => {
-      const o = document.createElement("option");
-      o.value = r;
-      o.textContent = r;
-      recursoSel.appendChild(o);
-
-      // también al filtro
-      if (!Array.from(filtroRecurso.options).some((opt) => opt.value === r)) {
-        filtroRecurso.appendChild(o.cloneNode(true));
-      }
-    });
-
-    autorInput.value = loggedUser || "";
-  }
+  autorInput.value = loggedUser || "";
+}
 
   function actualizarTitulo() {
-    if (stacksSel.value && recursoSel.value) {
-      titulo.value = `Recolectar ${stacksSel.value} stacks de ${recursoSel.value}`;
-    } else {
-      titulo.value = "";
+  const stacks = parseInt(stacksSel.value, 10) || 0;
+
+  if (stacks && recursoSel.value) {
+    const inventarios = Math.floor(stacks / 36);
+    const resto = stacks % 36;
+
+    let textoCantidad = "";
+
+    if (inventarios > 0) {
+      textoCantidad += `${inventarios} inventario${inventarios > 1 ? "s" : ""}`;
+      if (resto > 0) textoCantidad += " y ";
     }
+
+    if (resto > 0 || inventarios === 0) {
+      textoCantidad += `${resto} stack${resto === 1 ? "" : "s"}`;
+    }
+
+    titulo.value = `Recolectar ${textoCantidad} de ${recursoSel.value}`;
+  } else {
+    titulo.value = "";
   }
+}
 
   stacksSel.addEventListener("change", actualizarTitulo);
   recursoSel.addEventListener("change", actualizarTitulo);
@@ -669,30 +678,32 @@ btnLogin.addEventListener("click", async () => {
   // ==========================
   // RENDERIZAR MISIONES
   // ==========================
-  function renderMisiones() {
-    listaMisiones.innerHTML = "";
-    let visible = [...misiones];
+  visible.forEach((m) => {
+  const stacks = m.stacks || 0;
+  const total = (recursos[m.recurso] || 0) * stacks;
 
-    if (filtroRecurso.value) {
-      visible = visible.filter((m) => m.recurso === filtroRecurso.value);
-    }
+  // calcular inventarios y resto
+  const inventarios = Math.floor(stacks / 36);
+  const resto = stacks % 36;
 
-    if (visible.length === 0) {
-      listaMisiones.innerHTML = "<p>No hay misiones activas con esos criterios.</p>";
-      return;
-    }
+  let textoStacks = "";
+  if (inventarios > 0) {
+    textoStacks += `${inventarios} inventario${inventarios > 1 ? "s" : ""}`;
+    if (resto > 0) textoStacks += " y ";
+  }
+  if (resto > 0 || inventarios === 0) {
+    textoStacks += `${resto} stack${resto === 1 ? "" : "s"}`;
+  }
 
-    visible.forEach((m) => {
-      const total = (recursos[m.recurso] || 0) * (m.stacks || 0);
-      const card = document.createElement("div");
-      card.className = "mision" + (m.tomada_por ? " tomada" : "");
-      card.innerHTML = `
-        <h3>${m.titulo}</h3>
-        <p>🏷️ Recurso: ${m.recurso} (${m.stacks} stacks = ${total} unidades)</p>
-        <p>📅 Creada el: ${m.created_at ? new Date(m.created_at).toLocaleDateString() : "-"}</p>
-        <p>👤 Autor: ${m.autor}</p>
-        ${m.tomada_por ? `<p>⚒️ En curso por: <strong>${m.tomada_por}</strong></p>` : ""}
-      `;
+  const card = document.createElement("div");
+  card.className = "mision" + (m.tomada_por ? " tomada" : "");
+  card.innerHTML = `
+    <h3>${m.titulo}</h3>
+    <p>🏷️ Recurso: ${m.recurso} (${textoStacks} = ${total} unidades)</p>
+    <p>📅 Creada el: ${m.created_at ? new Date(m.created_at).toLocaleDateString() : "-"}</p>
+    <p>👤 Autor: ${m.autor}</p>
+    ${m.tomada_por ? `<p>⚒️ En curso por: <strong>${m.tomada_por}</strong></p>` : ""}
+  `;
 
       const btns = document.createElement("div");
       btns.className = "botones-mision";
@@ -717,7 +728,6 @@ btnLogin.addEventListener("click", async () => {
       card.appendChild(btns);
       listaMisiones.appendChild(card);
     });
-  }
 
   function renderCompletadas() {
     listaCompletadas.innerHTML = "";
@@ -758,17 +768,32 @@ btnLogin.addEventListener("click", async () => {
     }
 
     visible.forEach((m) => {
-      const card = document.createElement("div");
-      card.className = "mision tomada";
-      card.innerHTML = `
-        <h3>${m.titulo}</h3>
-        <p>🏷️ ${m.recurso} (${m.stacks} stacks)</p>
-        <p>💰 ${m.oro} oro</p>
-        <p>👤 Creada por: ${m.autor}</p>
-        <p>✅ Completada por: <strong>${m.completada_por || "-"}</strong></p>
-      `;
-      listaCompletadas.appendChild(card);
-    });
+  const stacks = m.stacks || 0;
+
+  const inventarios = Math.floor(stacks / 36);
+  const resto = stacks % 36;
+
+  let textoStacks = "";
+  if (inventarios > 0) {
+    textoStacks += `${inventarios} inventario${inventarios > 1 ? "s" : ""}`;
+    if (resto > 0) textoStacks += " y ";
+  }
+  if (resto > 0 || inventarios === 0) {
+    textoStacks += `${resto} stack${resto === 1 ? "" : "s"}`;
+  }
+
+  const card = document.createElement("div");
+  card.className = "mision tomada";
+  card.innerHTML = `
+    <h3>${m.titulo}</h3>
+    <p>🏷️ ${m.recurso} (${textoStacks})</p>
+    <p>💰 ${m.oro} oro</p>
+    <p>👤 Creada por: ${m.autor}</p>
+    <p>✅ Completada por: <strong>${m.completada_por || "-"}</strong></p>
+  `;
+  listaCompletadas.appendChild(card);
+});
+
   }
 
   // ==========================
