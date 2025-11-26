@@ -259,7 +259,11 @@
         filtroRecurso.innerHTML = '<option value="">Todos los recursos</option>';
 
         data.forEach((r) => {
-          recursosMap[r.nombre] = r.unidades_por_stack || 0;
+
+          recursosMap[r.nombre] = {
+            unidades: r.unidades_por_stack || 0,
+            valor: r.valor_unidad || 0
+          };
 
           const opt1 = document.createElement("option");
           opt1.value = r.nombre;
@@ -277,11 +281,25 @@
     }
 
     function actualizarTitulo() {
-      if (stacksSel.value && recursoSel.value) {
-        titulo.value = `Recolectar ${stacksSel.value} stacks de ${recursoSel.value}`;
-      } else {
+      const stacks = parseInt(stacksSel.value);
+      const recurso = recursoSel.value;
+
+      if (!stacks || !recurso) {
         titulo.value = "";
+        oroInput.value = "";
+        return;
       }
+
+      const info = recursosMap[recurso];
+
+      if (!info) return;
+
+      const unidadesTotales = stacks * info.unidades;
+      const oroCalculado = Math.round(unidadesTotales * info.valor);
+
+      // Actualiza título y oro automáticamente
+      titulo.value = `Recolectar ${stacks} stacks de ${recurso}`;
+      oroInput.value = oroCalculado;
     }
 
     stacksSel.addEventListener("change", actualizarTitulo);
