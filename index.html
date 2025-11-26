@@ -139,38 +139,42 @@
   // ==========================
   // DATOS EN MEMORIA DESDE SUPABASE (BASE DE DATOS - RECURSOS)
   // ==========================
- let recursos = {};
+ let recursos = {}; // mapa nombre -> unidades_por_stack (por si lo necesitas después)
 
 async function cargarRecursos() {
-  const { data, error } = await supabaseClient
-    .from("recursos")
-    .select("*")
-    .order("nombre");
+  try {
+    const { data, error } = await supabaseClient
+      .from("recursos")
+      .select("*")
+      .order("nombre", { ascending: true });
 
-  if (error) {
-    console.error("Error cargando recursos:", error);
-    return;
+    if (error) {
+      console.error("Error cargando recursos:", error);
+      alert("No se pudieron cargar los recursos desde el servidor.");
+      return;
+    }
+
+    recursos = {};
+    recursoSel.innerHTML = "<option value=''>Selecciona un recurso</option>";
+    filtroRecurso.innerHTML = "<option value=''>Todos los recursos</option>";
+
+    data.forEach((r) => {
+      // guardamos en el mapa por si después quieres usar unidades_por_stack
+      recursos[r.nombre] = r.unidades_por_stack ?? null;
+
+      const opt = document.createElement("option");
+      opt.value = r.nombre;
+      opt.textContent = r.nombre;
+      recursoSel.appendChild(opt);
+
+      const optFiltro = opt.cloneNode(true);
+      filtroRecurso.appendChild(optFiltro);
+    });
+  } catch (e) {
+    console.error("Error de conexión al cargar recursos:", e);
+    alert("Error de conexión al cargar recursos.");
   }
-
-  recursos = {};
-  recursoSel.innerHTML = `<option value="">Selecciona un recurso</option>`;
-  filtroRecurso.innerHTML = `<option value="">Todos los recursos</option>`;
-
-  data.forEach(r => {
-    recursos[r.nombre] = r.unidades_por_stack;
-
-    // SELECT principal
-    const opt = document.createElement("option");
-    opt.value = r.nombre;
-    opt.textContent = r.nombre;
-    recursoSel.appendChild(opt);
-
-    // Filtro
-    const opt2 = opt.cloneNode(true);
-    filtroRecurso.appendChild(opt2);
-  });
 }
-
 
   let misiones = [];      // se cargan desde Supabase
   let completadas = [];   // idem
@@ -303,49 +307,44 @@ const perfilSec = document.getElementById("perfilSec");  // ← ESTA LÍNEA ERA 
 
 
   function inicializarFormMision() {
-  // Limpiar stacks
-  stacksSel.value = "";
-
-  // Recursos
-  recursoSel.innerHTML = '<option value="">Selecciona un recurso</option>';
-  Object.keys(recursos).forEach((r) => {
-    const o = document.createElement("option");
-    o.value = r;
-    o.textContent = r;
-    recursoSel.appendChild(o);
-
-    // también al filtro
-    if (!Array.from(filtroRecurso.options).some((opt) => opt.value === r)) {
-      filtroRecurso.appendChild(o.cloneNode(true));
-    }
-  });
-
-  autorInput.value = loggedUser || "";
-}
-
-  function actualizarTitulo() {
-  const stacks = parseInt(stacksSel.value, 10) || 0;
-
-  if (stacks && recursoSel.value) {
-    const inventarios = Math.floor(stacks / 36);
-    const resto = stacks % 36;
-
-    let textoCantidad = "";
-
-    if (inventarios > 0) {
-      textoCantidad += `${inventarios} inventario${inventarios > 1 ? "s" : ""}`;
-      if (resto > 0) textoCantidad += " y ";
-    }
-
-    if (resto > 0 || inventarios === 0) {
-      textoCantidad += `${resto} stack${resto === 1 ? "" : "s"}`;
-    }
-
-    titulo.value = `Recolectar ${textoCantidad} de ${recursoSel.value}`;
-  } else {
+    // dejamos el campo de stacks vacío
+    stacksSel.value = "";
+    // dejamos el recurso sin seleccionar
+    recursoSel.value = "";
+    // limpiamos oro
+    oroInput.value = "";
+    // ponemos el nombre del usuario logueado como autor
+    autorInput.value = loggedUser || "";
+    // limpiamos el título
     titulo.value = "";
   }
+
+  function actualizarTitulo() {
+  const totalStacks = parseInt(stacksSel.value, 10) || 0;
+  const recurso = recursoSel.value;
+
+  if (!totalStacks || !recurso) {
+    titulo.value = "";
+    return;
+  }
+
+  const inventarios = Math.floor(totalStacks / 36);
+  const restoStacks = totalStacks % 36;
+
+  let textoCantidad = "";
+
+  if (inventarios > 0) {
+    textoCantidad += `${inventarios} inventario${inventarios > 1 ? "s" : ""}`;
+  }
+  if (restoStacks > 0) {
+    if (textoCantidad) textoCantidad += " y ";
+    textoCantidad += `${restoStacks} stack${restoStacks > 1 ? "s" : ""}`;
+  }
+
+  // ej: "Recolectar 1 inventario y 24 stacks de Arcilla"
+  titulo.value = `Recolectar ${textoCantidad} de ${recurso}`;
 }
+
 
   stacksSel.addEventListener("change", actualizarTitulo);
   recursoSel.addEventListener("change", actualizarTitulo);
@@ -460,41 +459,49 @@ const perfilSec = document.getElementById("perfilSec");  // ← ESTA LÍNEA ERA 
   // ==========================
   // LOGIN CON SUPABASE
   // ==========================
-btnLogin.addEventListener("click", async () => {
-  const user = loginUser.value.trim();
-  const pass = loginPass.value.trim();
+  btnLogin.addEventListener("click", async () => {
+    const user = loginUser.value.trim();
+    const pass = loginPass.value.trim();
 
-  const { data, error } = await supabaseClient.auth.signInWithPassword({
-    email: user,
-    password: pass
+    const { data, error } = await supabaseClient.auth.signInWithPassword({
+      email: user,
+      password: pass
+    });
+
+    if (error) {
+      alert("Usuario o contraseña incorrectos");
+      return;
+    }
+
+    // ⚠️ OBTENER NOMBRE AMISTOSO DESDE TU TABLA "usuarios"
+    const { data: perfil, error: perfilError } = await supabaseClient
+      .from("usuarios")
+      .select("*")
+      .eq("auth_id", data.user.id)
+      .single();
+
+    if (perfilError) {
+      console.error(perfilError);
+      alert("No se pudo obtener el perfil del jugador.");
+      return;
+    }
+
+    loggedUser = perfil.nombre;      // <-- nombre visible
+    guardar();
+    actualizarUsuarioLogueadoUI();
+
+    // 👇 NUEVO: cargar recursos y misiones, e inicializar form
+    await cargarRecursos();
+    await cargarMisiones();
+    inicializarFormMision();
+
+    // mostrar app
+    loginSec.style.display = "none";
+    registerSec.style.display = "none";
+    appSec.style.display = "block";
+    userMenuContainer.style.display = "block";
   });
 
-  if (error) {
-    alert("Usuario o contraseña incorrectos");
-    return;
-  }
-
-  // 1️⃣ OBTENER EL NOMBRE REAL DESDE SUPABASE
-  const { data: userData } = await supabaseClient
-    .from("usuarios")
-    .select("nombre")
-    .eq("email", user)
-    .single();
-
-  // 2️⃣ GUARDAR USUARIO EN SESIÓN LOCAL
-  loggedUser = userData.nombre
-  guardar();
-  actualizarUsuarioLogueadoUI();
-
-  // 3️⃣ HABILITAR MENÚ Y TABLÓN
-  userMenuContainer.style.display = "block";
-  loginSec.style.display = "none";
-  appSec.style.display = "block";
-
-  // 4️⃣ REINICIAR FORMULARIOS
-  inicializarFormMision();
-  await cargarMisiones();
-});
 
   // ==========================
   // CREAR MISIÓN (SUPABASE)
@@ -876,22 +883,19 @@ btnLogin.addEventListener("click", async () => {
     registerSec.style.display = "none";
     appSec.style.display = "block";
 
-    await cargarRecursos();
-    inicializarFormMision();
-
-    actualizarUsuarioLogueadoUI();
-    await cargarMisiones();
-
     userMenuContainer.style.display = "block";
+
+    await cargarRecursos();
+    await cargarMisiones();
+    inicializarFormMision();
+    actualizarUsuarioLogueadoUI();
   } else {
     loginSec.style.display = "block";
     registerSec.style.display = "none";
     appSec.style.display = "none";
-
     userMenuContainer.style.display = "none";
   }
 })();
-
 
     // ==========================
     // CERRAR SESIÓN
